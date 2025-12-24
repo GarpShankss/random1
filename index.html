@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-⦁	<title>Happy Birthday Bhoomi 💖✨</title>
+<title>Happy Birthday Bhoomi 💖✨</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Indie+Flower&display=swap" rel="stylesheet">
 
@@ -17,17 +17,20 @@ body{
     overflow-x:hidden;
 }
 
-/* 🌙 STARS */
+/* 🌙 FLOATING STARS */
 .stars{
     position:fixed;
     inset:0;
     background:url("https://www.transparenttextures.com/patterns/stardust.png");
-    opacity:0;
-    animation:starsFade 3s forwards;
+    animation:floatStars 20s linear infinite;
+    opacity:.5;
     pointer-events:none;
     z-index:0;
 }
-@keyframes starsFade{to{opacity:.6}}
+@keyframes floatStars{
+    from{background-position:0 0}
+    to{background-position:1000px 600px}
+}
 
 /* ===== ENTRY SCREEN ===== */
 #entry-screen{
@@ -41,18 +44,13 @@ body{
 }
 #entry-screen.hidden{opacity:0;pointer-events:none}
 
-#hover-message {
-    font-family: 'Dancing Script', cursive;
-    font-size: 1.8rem;
-    color: #fff;
-    margin-bottom: 1.5rem;
-    opacity: 1;              /* always visible */
-    transform: none;
-    pointer-events: none;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+#hover-message{
+    font-family:'Dancing Script',cursive;
+    font-size:1.8rem;
+    color:#fff;
+    margin-bottom:1.5rem;
+    text-shadow:2px 2px 8px rgba(0,0,0,.5);
 }
-
-#hover-message.show{opacity:1}
 
 .button-container{display:flex;gap:2rem}
 
@@ -66,12 +64,10 @@ body{
     cursor:pointer;
 }
 #yes-button{background:#ff6b9d}
-#no-button {
-    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-    box-shadow: 0 8px 25px rgba(73, 80, 87, 0.4);
-    position: fixed;
-    z-index: 20;
-    pointer-events: none; /* ❌ cannot be clicked */
+#no-button{
+    background:#6c757d;
+    position:fixed;
+    pointer-events:none;
 }
 
 /* ===== BIRTHDAY PAGE ===== */
@@ -92,30 +88,18 @@ body{
 .message-card{
     background:#fff8e7;
     padding:2.5rem;
-    margin:auto;
     max-width:700px;
-    box-shadow:0 10px 30px rgba(0,0,0,.3);
+    margin:auto;
     text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,.3);
     transform:rotate(-.5deg);
 }
 .message-card h1{
     font-family:'Dancing Script',cursive;
     color:#c44569;
-    margin-bottom:1rem;
-}
-.photo {
-    object-fit: cover;
-    border-radius: 3px;
 }
 
-/* TYPEWRITER */
-.typewriter span{
-    border-right:2px solid #c44569;
-    animation:blink 1s infinite;
-}
-@keyframes blink{50%{border-color:transparent}}
-
-/* 📸 PHOTOS */
+/* 📸 PHOTO GRID */
 .photo-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -123,34 +107,71 @@ body{
     margin-top:4rem;
 }
 
-.photo-frame {
-    background: #fff;
-    padding: 1rem;
-    box-shadow: 0 8px 25px rgba(0,0,0,.3);
-    transform: rotate(var(--r));
-    transition: .3s;
-    text-align: center;
-    width: 100%;
-    height: 260px;        /* fixed card height */
-    overflow: hidden;
+/* 📸 PHOTO FRAME */
+.photo-frame{
+    background:#fff;
+    padding:1rem;
+    box-shadow:0 8px 25px rgba(0,0,0,.3);
+    transform:rotate(var(--r));
+    transition:.3s;
+    text-align:center;
+    position:relative;
+}
+.photo-frame:hover{transform:rotate(0) scale(1.05)}
+
+/* 🧷 RED PIN */
+.photo-frame::before{
+    content:"";
+    position:absolute;
+    top:-12px;
+    left:50%;
+    transform:translateX(-50%);
+    width:18px;
+    height:18px;
+    background:radial-gradient(circle,#e53935,#b71c1c);
+    border-radius:50%;
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+    z-index:5;
+}
+.photo-frame::after{
+    content:"";
+    position:absolute;
+    top:4px;
+    left:50%;
+    transform:translateX(-50%);
+    width:3px;
+    height:10px;
+    background:#777;
+    z-index:4;
 }
 
-.photo-frame:hover {
-    transform: rotate(0) scale(1.05);
+/* IMAGE HOLDER */
+.photo-img{
+    height:260px;
+    overflow:hidden;
+    margin-bottom:.6rem;
 }
 
-.photo-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;  /* intact photo aspect */
-    border-radius: 3px;
+/* IMAGE */
+.photo-img img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    border-radius:3px;
 }
 
-/* 📸 CAPTION */
+/* 💌 HANDWRITTEN CAPTION ANIMATION */
 .caption{
-    margin-top:.8rem;
-    font-size:1.1rem;
+    font-family:'Dancing Script',cursive;
+    font-size:1.2rem;
     color:#555;
+    opacity:0;
+    transform:translateY(6px);
+    animation:writeCaption 1s ease forwards;
+    animation-delay:.6s;
+}
+@keyframes writeCaption{
+    to{opacity:1;transform:none}
 }
 
 /* 🎉 CONFETTI */
@@ -164,9 +185,6 @@ body{
 @keyframes fall{
     to{transform:translateY(110vh) rotate(360deg)}
 }
-
-
-
 </style>
 </head>
 
@@ -183,16 +201,18 @@ body{
     </div>
 </div>
 
-<!-- BIRTHDAY -->
+<!-- BIRTHDAY PAGE -->
 <div id="birthday-page">
 <div class="container">
 
 <div class="message-card">
 <h1>Happy Birthday, Beautiful ✨</h1>
-<h2>Bhoomika🌸💖</h2>
-
-<p class="typewriter" id="typeText"></p>
-<p style="margin-top:1.5rem;font-style:italic">
+<h2>Bhoomika 🌸💖</h2>
+<p style="margin-top:1rem">
+Some days feel brighter for no reason.<br>
+Maybe today is one of them.
+</p>
+<p style="margin-top:1.2rem;font-style:italic">
 I’m really glad you said yes 🤍
 </p>
 </div>
@@ -200,106 +220,77 @@ I’m really glad you said yes 🤍
 <div class="photo-grid">
 
 <div class="photo-frame" style="--r:3deg">
-    <img src="birthday/memory1.jpeg" alt="Memory 1" class="photo">
+    <div class="photo-img"><img src="birthday/memory1.jpeg"></div>
     <div class="caption">A moment worth keeping ✨</div>
 </div>
 
 <div class="photo-frame" style="--r:-2deg">
-    <img src="birthday/memory2.jpeg" alt="Memory 2" class="photo">
+    <div class="photo-img"><img src="birthday/memory2.jpeg"></div>
     <div class="caption">Still makes me smile 🌸</div>
 </div>
 
 <div class="photo-frame" style="--r:4deg">
-    <img src="birthday/memory3.jpeg" alt="Memory 3" class="photo">
+    <div class="photo-img"><img src="birthday/memory3.jpeg"></div>
     <div class="caption">One of my favorites 💫</div>
 </div>
 
 <div class="photo-frame" style="--r:-3deg">
-    <img src="birthday/memory4.jpeg" alt="Memory 4" class="photo">
+    <div class="photo-img"><img src="birthday/memory4.jpeg"></div>
     <div class="caption">A beautiful day 🌙</div>
 </div>
 
 <div class="photo-frame" style="--r:2deg">
-    <img src="birthday/memory5.jpeg" alt="Memory 5" class="photo">
+    <div class="photo-img"><img src="birthday/memory5.jpeg"></div>
     <div class="caption">Just because 💖</div>
 </div>
 
 </div>
-
 </div>
 </div>
 
-<!-- 🎵 MUSIC -->
+<!-- MUSIC -->
 <audio id="music" loop>
 <source src="music.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-const yes = document.getElementById("yes-button");
-const no = document.getElementById("no-button");
-const entry = document.getElementById("entry-screen");
-const page = document.getElementById("birthday-page");
-const music = document.getElementById("music");
+const yes=document.getElementById("yes-button");
+const no=document.getElementById("no-button");
+const entry=document.getElementById("entry-screen");
+const page=document.getElementById("birthday-page");
+const music=document.getElementById("music");
 
-/* YES click */
-yes.onclick = () => {
+yes.onclick=()=>{
     entry.classList.add("hidden");
-    music.volume = 0.4;
+    music.volume=.4;
     music.play();
-
-    setTimeout(() => {
+    setTimeout(()=>{
         page.classList.add("visible");
-        typeWriter();
         confetti();
-    }, 400);
+    },400);
 };
 
-/* NO button runs away from cursor */
-document.addEventListener("mousemove", (e) => {
-    const rect = no.getBoundingClientRect();
-
-    const distance = Math.hypot(
-        e.clientX - (rect.left + rect.width / 2),
-        e.clientY - (rect.top + rect.height / 2)
-    );
-
-    if (distance < 120) {
-        const maxX = window.innerWidth - rect.width - 20;
-        const maxY = window.innerHeight - rect.height - 20;
-
-        no.style.left = Math.random() * maxX + "px";
-        no.style.top = Math.random() * maxY + "px";
+document.addEventListener("mousemove",(e)=>{
+    const r=no.getBoundingClientRect();
+    const d=Math.hypot(e.clientX-(r.left+r.width/2),e.clientY-(r.top+r.height/2));
+    if(d<120){
+        no.style.left=Math.random()*(window.innerWidth-r.width)+"px";
+        no.style.top=Math.random()*(window.innerHeight-r.height)+"px";
     }
 });
 
-/* TYPEWRITER */
-const text = `Today feels brighter for no reason.
-Maybe it’s because the world got someone special today.
-I hope your day is full of soft laughter and quiet happiness.`;
-let i = 0;
-
-function typeWriter() {
-    if (i < text.length) {
-        document.getElementById("typeText").innerHTML += text.charAt(i);
-        i++;
-        setTimeout(typeWriter, 40);
-    }
-}
-
-/* CONFETTI */
-function confetti() {
-    for (let i = 0; i < 80; i++) {
-        const c = document.createElement("div");
-        c.className = "confetti";
-        c.style.left = Math.random() * 100 + "vw";
-        c.style.background = ["#ff6b9d", "#ffd166", "#bde0fe", "#cdb4db"][Math.floor(Math.random() * 4)];
-        c.style.animationDuration = 2 + Math.random() * 3 + "s";
+function confetti(){
+    for(let i=0;i<80;i++){
+        const c=document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*100+"vw";
+        c.style.background=["#ff6b9d","#ffd166","#bde0fe","#cdb4db"][Math.floor(Math.random()*4)];
+        c.style.animationDuration=2+Math.random()*3+"s";
         document.body.appendChild(c);
-        setTimeout(() => c.remove(), 5000);
+        setTimeout(()=>c.remove(),5000);
     }
 }
 </script>
-
 
 </body>
 </html>
