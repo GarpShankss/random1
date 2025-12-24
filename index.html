@@ -123,25 +123,27 @@ body{
     margin-top:4rem;
 }
 
-.photo-frame{
-    background:#fff;
-    padding:1rem;
-    box-shadow:0 8px 25px rgba(0,0,0,.3);
-    transform:rotate(var(--r));
-    transition:.3s;
-    text-align:center;
+.photo-frame {
+    background: #fff;
+    padding: 1rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,.3);
+    transform: rotate(var(--r));
+    transition: .3s;
+    text-align: center;
+    width: 100%;
+    height: 260px;        /* fixed card height */
+    overflow: hidden;
 }
-.photo-frame:hover{transform:rotate(0) scale(1.05)}
 
-.photo{
-    width:100%;
-    aspect-ratio:4/3;
-    background:#ffd7e5;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:'Dancing Script',cursive;
-    color:#c44569;
+.photo-frame:hover {
+    transform: rotate(0) scale(1.05);
+}
+
+.photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;  /* intact photo aspect */
+    border-radius: 3px;
 }
 
 /* 📸 CAPTION */
