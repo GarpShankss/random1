@@ -53,9 +53,10 @@ p{
     background:#ff6b9d;
     color:#fff;
     box-shadow:0 10px 25px rgba(0,0,0,.3);
+    z-index:5;
 }
 
-/* ===== 🌼 PAGE 1 : FLOWER GARDEN ===== */
+/* ===== 🌼 WELCOME PAGE ===== */
 #welcome{
     background:
         radial-gradient(circle at 20% 30%, #ffb3d9, transparent 40%),
@@ -73,9 +74,25 @@ p{
     justify-content:center;
     align-items:center;
     flex-wrap:wrap;
+    pointer-events:none;
 }
 
-/* ===== 🎨 PAGE 2 & 3 : GRAFFITI STYLE ===== */
+/* Floating pixel flowers */
+.pixel-flower{
+    position:absolute;
+    font-size:1.8rem;
+    animation:floatUp 6s linear infinite;
+    opacity:.8;
+    pointer-events:none;
+}
+
+@keyframes floatUp{
+    from{transform:translateY(100vh) scale(.6);opacity:0}
+    20%{opacity:.8}
+    to{transform:translateY(-10vh) scale(1);opacity:0}
+}
+
+/* ===== 🎨 GRAFFITI PAGES ===== */
 .graffiti{
     background:
         repeating-linear-gradient(
@@ -98,9 +115,22 @@ p{
     justify-content:center;
     align-items:center;
     flex-wrap:wrap;
+    pointer-events:none;
 }
 
-/* ===== 🎉 PARTY PAGE ===== */
+/* Doodle strokes */
+.doodle{
+    position:absolute;
+    inset:0;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.15) 2px, transparent 3px),
+        radial-gradient(circle at 80% 40%, rgba(255,255,255,.15) 2px, transparent 3px),
+        radial-gradient(circle at 50% 80%, rgba(255,255,255,.15) 2px, transparent 3px);
+    background-size:80px 80px;
+    pointer-events:none;
+}
+
+/* ===== PARTY PAGE ===== */
 #party{
     background:linear-gradient(to top, #30cfd0, #330867);
     color:#fff;
@@ -121,7 +151,7 @@ p{
 
 <body>
 
-<!-- 🌼 WELCOME PAGE -->
+<!-- 🌼 WELCOME -->
 <section id="welcome" class="page flowers">
     <h1>Welcome 🌸</h1>
     <p>
@@ -129,10 +159,17 @@ p{
         made for a <b>beautiful & elegant lady</b>.
     </p>
     <button class="btn" onclick="nextPage('q1')">Next ✨</button>
+
+    <!-- floating flowers -->
+    <div class="pixel-flower" style="left:10%;animation-delay:0s">🌸</div>
+    <div class="pixel-flower" style="left:30%;animation-delay:2s">🌼</div>
+    <div class="pixel-flower" style="left:55%;animation-delay:4s">🌺</div>
+    <div class="pixel-flower" style="left:75%;animation-delay:1s">🌷</div>
 </section>
 
 <!-- 🎨 QUESTION 1 -->
 <section id="q1" class="page graffiti hidden">
+    <div class="doodle"></div>
     <h1>A quick question 💭</h1>
     <p>Is today your birthday?</p>
     <div class="button-row">
@@ -143,6 +180,7 @@ p{
 
 <!-- 🎨 QUESTION 2 -->
 <section id="q2" class="page graffiti hidden">
+    <div class="doodle"></div>
     <h1>Just checking 😄</h1>
     <p>
         Are you ready for a small surprise<br>
@@ -151,7 +189,7 @@ p{
     <button class="btn" onclick="nextPage('party')">I think so ✨</button>
 </section>
 
-<!-- 🎉 PARTY PAGE -->
+<!-- 🎉 PARTY -->
 <section id="party" class="page hidden">
     <h1>One last thing 🎉</h1>
     <p>Will you give me a party? 😊</p>
