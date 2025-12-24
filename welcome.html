@@ -186,18 +186,10 @@ p{
         Are you ready for a small surprise<br>
         made with a little care?
     </p>
-    <button class="btn" onclick="nextPage('party')">I think so ✨</button>
+    <button class="btn" onclick="goToParty()">I think so ✨</button>
 </section>
 
-<!-- 🎉 PARTY -->
-<section id="party" class="page hidden">
-    <h1>One last thing 🎉</h1>
-    <p>Will you give me a party? 😊</p>
-    <div class="button-row">
-        <button class="btn">Yes 💖</button>
-        <button class="btn">No 😜</button>
-    </div>
-</section>
+
 
 <script>
 function nextPage(id){
@@ -205,6 +197,21 @@ function nextPage(id){
     document.getElementById(id).classList.remove('hidden');
 }
 </script>
+    <script>
+function nextPage(id){
+    document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+}
+
+function goToParty(){
+    // smooth transition feel
+    document.body.style.opacity = "0";
+    setTimeout(() => {
+        window.location.href = "index.html";
+    }, 600);
+}
+</script>
+
 
 </body>
 </html>
