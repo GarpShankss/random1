@@ -392,9 +392,23 @@ function isNearNoButton(e) {
 }
 
 document.addEventListener("mousemove", isNearNoButton);
-document.addEventListener("touchstart", isNearNoButton, { passive: true });
+
     
-    
+["click", "touchend"].forEach(event => {
+    no.addEventListener(event, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        moveNoButton();
+        return false;
+    });
+});
+
+no.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    moveNoButton();
+    showNoMessage();
+}, { passive: false });
+
 
 
 
