@@ -11,7 +11,6 @@
 *{margin:0;padding:0;box-sizing:border-box}
 
 /* ===== BACKGROUND ===== */
-    /* ===== BACKGROUND ===== */
 body{
     font-family:'Indie Flower',cursive;
     background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%);
@@ -53,7 +52,11 @@ body{
     text-shadow:2px 2px 8px rgba(0,0,0,.5);
 }
 
-.button-container{display:flex;gap:2rem}
+.button-container{
+    display:flex;
+    gap:2rem;
+    position:relative;
+}
 
 .entry-btn{
     padding:1rem 3rem;
@@ -64,15 +67,49 @@ body{
     color:#fff;
     cursor:pointer;
 }
-#yes-button{background:#ff6b9d}
-#no-button {
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: none;
-    transition: left .15s ease, top .15s ease;
+
+/* 🎈 YES BUTTON */
+#yes-button{
+    background:#ff6b9d;
+    animation:yesPulse 2s infinite;
+}
+@keyframes yesPulse{
+    0%{box-shadow:0 0 0 0 rgba(255,107,157,.6)}
+    70%{box-shadow:0 0 0 18px rgba(255,107,157,0)}
+    100%{box-shadow:0 0 0 0 rgba(255,107,157,0)}
 }
 
+/* ❌ NO BUTTON */
+#no-button{
+    background:#6c757d;
+    position:fixed;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:none;
+    pointer-events:none;
+    transition:left .15s ease, top .15s ease;
+}
+
+/* 💬 FUNNY NO MESSAGE */
+#no-message{
+    position:fixed;
+    background:rgba(0,0,0,.75);
+    color:#fff;
+    padding:8px 14px;
+    border-radius:20px;
+    font-family:'Dancing Script',cursive;
+    font-size:1rem;
+    opacity:0;
+    pointer-events:none;
+    transform:scale(.8);
+    transition:.3s;
+    z-index:50;
+}
+#no-message.show{
+    opacity:1;
+    transform:scale(1);
+}
 
 /* ===== BIRTHDAY PAGE ===== */
 #birthday-page{
@@ -135,7 +172,6 @@ body{
     background:radial-gradient(circle,#e53935,#b71c1c);
     border-radius:50%;
     box-shadow:0 3px 6px rgba(0,0,0,.4);
-    z-index:5;
 }
 .photo-frame::after{
     content:"";
@@ -146,7 +182,6 @@ body{
     width:3px;
     height:10px;
     background:#777;
-    z-index:4;
 }
 
 /* IMAGE HOLDER */
@@ -164,7 +199,7 @@ body{
     border-radius:3px;
 }
 
-/* 💌 HANDWRITTEN CAPTION ANIMATION */
+/* 💌 CAPTION */
 .caption{
     font-family:'Dancing Script',cursive;
     font-size:1.2rem;
@@ -176,6 +211,13 @@ body{
 }
 @keyframes writeCaption{
     to{opacity:1;transform:none}
+}
+
+/* 📱 SMALL MOBILE FIX */
+@media(max-width:360px){
+    .button-container{gap:1.2rem}
+    .entry-btn{padding:.9rem 2.2rem;font-size:1.2rem}
+    #hover-message{text-align:center;padding:0 1rem}
 }
 
 /* 🎉 CONFETTI */
@@ -202,6 +244,7 @@ body{
     <div class="button-container">
         <button id="yes-button" class="entry-btn">Yes</button>
         <button id="no-button" class="entry-btn" aria-hidden="true">No</button>
+        <div id="no-message">Haha 😄</div>
     </div>
 </div>
 
@@ -213,18 +256,13 @@ body{
 <h1>Happy Birthday, Beautiful 💓✨</h1>
 <h2>Bhoomika 🌸💕</h2>
 <p style="margin-top:1rem">
-Some people brighten spaces
-without even trying.<br>
+Some people brighten spaces without even trying.<br>
 Today feels a little lighter somehow.<br>
 Maybe because someone who brings quiet warmth into the world
-is celebrating today.<br>
-
-I hope your day is gentle,
-filled with smiles that come naturally
-and moments that feel easy and kind.
+is celebrating today.
 </p>
 <p style="margin-top:1.2rem;font-style:italic">
-I’m really glad you said yes  🤍
+I’m really glad you said yes 🤍
 </p>
 </div>
 
@@ -265,74 +303,69 @@ I’m really glad you said yes  🤍
 </audio>
 
 <script>
-const yes = document.getElementById("yes-button");
-const no = document.getElementById("no-button");
-const entry = document.getElementById("entry-screen");
-const page = document.getElementById("birthday-page");
-const music = document.getElementById("music");
+const yes=document.getElementById("yes-button");
+const no=document.getElementById("no-button");
+const entry=document.getElementById("entry-screen");
+const page=document.getElementById("birthday-page");
+const music=document.getElementById("music");
+const noMsg=document.getElementById("no-message");
 
-/* YES click */
-yes.onclick = () => {
+const noMessages=[
+    "Haha 😄",
+    "You tried 😜",
+    "Nope 😌",
+    "Almost 💫",
+    "That tickles 😂"
+];
+
+yes.onclick=()=>{
     entry.classList.add("hidden");
-    music.volume = .4;
+    music.volume=.4;
     music.play();
-    setTimeout(() => {
+    setTimeout(()=>{
         page.classList.add("visible");
         confetti();
-    }, 400);
+    },400);
 };
 
-/* Move NO button safely */
-function moveNoButton() {
-    const yesRect = yes.getBoundingClientRect();
-    const noRect = no.getBoundingClientRect();
-
-    let x, y;
-    let safe = false;
-
-    while (!safe) {
-        x = Math.random() * (window.innerWidth - noRect.width);
-        y = Math.random() * (window.innerHeight - noRect.height);
-
-        // ensure NO does not overlap YES
-        if (
-            x + noRect.width < yesRect.left ||
-            x > yesRect.right ||
-            y + noRect.height < yesRect.top ||
-            y > yesRect.bottom
-        ) {
-            safe = true;
-        }
-    }
-
-    no.style.left = x + "px";
-    no.style.top = y + "px";
+function showNoMessage(){
+    noMsg.textContent=noMessages[Math.floor(Math.random()*noMessages.length)];
+    noMsg.style.left=no.style.left;
+    noMsg.style.top=(parseInt(no.style.top||0)-40)+"px";
+    noMsg.classList.add("show");
+    setTimeout(()=>noMsg.classList.remove("show"),800);
 }
 
-/* Desktop hover */
-document.addEventListener("mousemove", () => moveNoButton());
+function moveNoButton(){
+    const y=yes.getBoundingClientRect();
+    const n=no.getBoundingClientRect();
+    let x,yPos,ok=false;
 
-/* Mobile touch */
-document.addEventListener("touchstart", (e) => {
-    moveNoButton();
-}, { passive: true });
+    while(!ok){
+        x=Math.random()*(window.innerWidth-n.width);
+        yPos=Math.random()*(window.innerHeight-n.height);
+        if(
+            x+n.width<y.left||x>y.right||
+            yPos+n.height<y.top||yPos>y.bottom
+        ) ok=true;
+    }
+    no.style.left=x+"px";
+    no.style.top=yPos+"px";
+    showNoMessage();
+}
 
-/* Extra safety: block clicks */
-no.addEventListener("click", (e) => {
-    e.preventDefault();
-    moveNoButton();
-});
+document.addEventListener("mousemove",moveNoButton);
+document.addEventListener("touchstart",moveNoButton,{passive:true});
 
-/* CONFETTI */
-function confetti() {
-    for (let i = 0; i < 80; i++) {
-        const c = document.createElement("div");
-        c.className = "confetti";
-        c.style.left = Math.random() * 100 + "vw";
-        c.style.background = ["#ff6b9d","#ffd166","#bde0fe","#cdb4db"][Math.floor(Math.random()*4)];
-        c.style.animationDuration = 2 + Math.random() * 3 + "s";
+function confetti(){
+    for(let i=0;i<80;i++){
+        const c=document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*100+"vw";
+        c.style.background=["#ff6b9d","#ffd166","#bde0fe","#cdb4db"][Math.floor(Math.random()*4)];
+        c.style.animationDuration=2+Math.random()*3+"s";
         document.body.appendChild(c);
-        setTimeout(() => c.remove(), 5000);
+        setTimeout(()=>c.remove(),5000);
     }
 }
 </script>
