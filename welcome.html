@@ -193,21 +193,17 @@ p{
 
 <script>
 function nextPage(id){
-    document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-}
-</script>
-    <script>
-function nextPage(id){
-    document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
 }
 
 function goToParty(){
-    // smooth transition feel
+    // smooth fade-out
+    document.body.style.transition = "opacity .6s ease";
     document.body.style.opacity = "0";
+
     setTimeout(() => {
-        window.location.href = "index.html";
+        window.location.href = "index.html"; // PARTY PAGE
     }, 600);
 }
 </script>
