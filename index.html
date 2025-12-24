@@ -88,7 +88,7 @@ body{
     touch-action:none;
     pointer-events:none;
     transition:left .15s ease, top .15s ease;
-    opacity: 0;
+    
 }
 
 /* 💬 FUNNY NO MESSAGE */
@@ -373,8 +373,10 @@ function moveNoButton(){
     setTimeout(() => noCooldown = false, 700); // 👈 cooldown
 }
 
-window.addEventListener("load", placeNoButtonInitially);
-window.addEventListener("resize", placeNoButtonInitially);
+// Place NO button as soon as layout exists (fast, mobile-safe)
+requestAnimationFrame(() => {
+    placeNoButtonInitially();
+});
 
 function isNearNoButton(e) {
     const rect = no.getBoundingClientRect();
