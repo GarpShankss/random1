@@ -24,7 +24,6 @@ body{
     background:url("https://www.transparenttextures.com/patterns/stardust.png");
     animation:floatStars 20s linear infinite;
     opacity:.5;
-    pointer-events:none;
     z-index:0;
 }
 @keyframes floatStars{
@@ -89,6 +88,7 @@ body{
     touch-action:none;
     pointer-events:none;
     transition:left .15s ease, top .15s ease;
+    opacity: 0;
 }
 
 /* 💬 FUNNY NO MESSAGE */
@@ -309,6 +309,19 @@ const entry=document.getElementById("entry-screen");
 const page=document.getElementById("birthday-page");
 const music=document.getElementById("music");
 const noMsg=document.getElementById("no-message");
+    let noCooldown = false;
+
+
+function placeNoButtonInitially() {
+const yesRect = yes.getBoundingClientRect();
+
+const x = yesRect.right + 40; // place right of YES
+const y = yesRect.top;
+
+    no.style.left = x + "px";
+    no.style.top = y + "px";
+    no.style.opacity = "1";
+}
 
 const noMessages=[
     "Haha 😄",
@@ -337,25 +350,53 @@ function showNoMessage(){
 }
 
 function moveNoButton(){
-    const y=yes.getBoundingClientRect();
-    const n=no.getBoundingClientRect();
-    let x,yPos,ok=false;
+    if (noCooldown) return;
+    noCooldown = true;
+
+    const y = yes.getBoundingClientRect();
+    const n = no.getBoundingClientRect();
+    let x, yPos, ok = false;
 
     while(!ok){
-        x=Math.random()*(window.innerWidth-n.width);
-        yPos=Math.random()*(window.innerHeight-n.height);
+        x = Math.random() * (window.innerWidth - n.width);
+        yPos = Math.random() * (window.innerHeight - n.height);
         if(
-            x+n.width<y.left||x>y.right||
-            yPos+n.height<y.top||yPos>y.bottom
-        ) ok=true;
+            x + n.width < y.left || x > y.right ||
+            yPos + n.height < y.top || yPos > y.bottom
+        ) ok = true;
     }
-    no.style.left=x+"px";
-    no.style.top=yPos+"px";
+
+    no.style.left = x + "px";
+    no.style.top = yPos + "px";
     showNoMessage();
+
+    setTimeout(() => noCooldown = false, 700); // 👈 cooldown
 }
 
-document.addEventListener("mousemove",moveNoButton);
-document.addEventListener("touchstart",moveNoButton,{passive:true});
+window.addEventListener("load", placeNoButtonInitially);
+window.addEventListener("resize", placeNoButtonInitially);
+
+function isNearNoButton(e) {
+    const rect = no.getBoundingClientRect();
+    const x = e.clientX || (e.touches && e.touches[0].clientX);
+    const y = e.clientY || (e.touches && e.touches[0].clientY);
+
+    const distance = Math.hypot(
+        x - (rect.left + rect.width / 2),
+        y - (rect.top + rect.height / 2)
+    );
+
+    if (distance < 100) {
+        moveNoButton();
+    }
+}
+
+document.addEventListener("mousemove", isNearNoButton);
+document.addEventListener("touchstart", isNearNoButton, { passive: true });
+    
+    
+
+
 
 function confetti(){
     for(let i=0;i<80;i++){
