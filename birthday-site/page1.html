@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday SBG 🎀</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    font-family: 'Nunito', sans-serif;
+    overflow: hidden;
+  }
+
+  /* ── Full bleed cat background ── */
+  .bg {
+    position: fixed;
+    inset: 0;
+    background-image: url('images/cat-bg.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 0;
+  }
+
+  /* Very subtle vignette — keeps the cat fully visible, just darkens extreme edges */
+  .vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(
+      ellipse 85% 80% at 50% 45%,
+      transparent 50%,
+      rgba(0,0,0,0.50) 100%
+    );
+    pointer-events: none;
+  }
+ 
+
+  /* ── Center layout ── */
+  .container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;   /* card at bottom, cat face dominates */
+    padding-bottom: 77px;
+  }
+
+  /* ── Card ── */
+  .welcome-card {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.25);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1.5px solid rgba(255,200,240,0.45);
+    border-radius: 28px;
+    padding: 26px 38px 28px;
+    text-align: center;
+    max-width: 440px;
+    width: calc(100% - 32px);
+    box-shadow:
+      0 8px 40px rgba(0,0,0,0.35),
+      0 1px 0 rgba(255,255,255,0.15) inset;
+    animation: slideUp 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(70px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .welcome-text {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(1.35rem, 5vw, 1.9rem);
+    color: #fff;
+    text-shadow:
+      0 2px 18px rgba(255,80,180,0.85),
+      0 0 40px rgba(255,140,220,0.4);
+    line-height: 1.35;
+    margin-bottom: 6px;
+  }
+
+  .sub-text {
+    font-size: clamp(0.9rem, 3vw, 1.05rem);
+    color: rgba(255,220,245,0.88);
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .lessgooo {
+    font-size: clamp(1.3rem, 4.5vw, 1.7rem);
+    font-weight: 900;
+    color: #ffe4f5;
+    text-shadow: 0 2px 10px rgba(255,80,160,0.6);
+    margin-bottom: 4px;
+  }
+
+  /* ── Button ── */
+  .btn-main {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6eb4, #c94fcf, #7c3aed);
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    padding: 13px 40px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.8px;
+    box-shadow: 0 6px 28px rgba(200,80,200,0.55);
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: pulse 2.4s ease-in-out infinite;
+    margin-top: 4px;
+  }
+
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 6px 28px rgba(200,80,200,0.55), 0 0 0 0   rgba(255,110,180,0.4); }
+    50%      { box-shadow: 0 6px 28px rgba(200,80,200,0.55), 0 0 0 11px rgba(255,110,180,0); }
+  }
+
+  .btn-main:hover  { transform: translateY(-4px) scale(1.05); box-shadow: 0 12px 36px rgba(200,80,200,0.75); }
+  .btn-main:active { transform: scale(0.97); }
+
+  /* ── Page transition ── */
+  .page-transition {
+    position: fixed; inset: 0;
+    background: linear-gradient(135deg, #ff6eb4, #c94fcf, #7c3aed);
+    z-index: 999;
+    transform: translateX(-100%);
+    transition: transform 0.5s cubic-bezier(0.77,0,0.18,1);
+  }
+  .page-transition.active { transform: translateX(0); }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="vignette"></div>
+ <div class="eye-glow"></div>
+<div class="page-transition" id="pt"></div>
+
+
+<div class="container">
+  <div class="welcome-card">
+    <div class="welcome-text">Ohh you are here,<br>Welcome SBG 🎀</div>
+    <div class="lessgooo">Lessgooo 🚀</div>
+    <div class="sub-text">Wanna see a Photo Library?</div>
+    <button class="btn-main" onclick="goNext()">Click This ✨</button>
+  </div>
+</div>
+
+<script>
+  function goNext() {
+    document.getElementById('pt').classList.add('active');
+    setTimeout(() => window.location.href = 'page2.html', 500);
+  }
+</script>
+</body>
+</html>

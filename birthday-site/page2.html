@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Hall 🦆</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #06030f;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        #c {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* ── Loading ── */
+        #loading {
+            position: fixed;
+            inset: 0;
+            z-index: 99;
+            background: #06030f;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+        }
+
+        .ld-duck {
+            font-size: 4.5rem;
+            animation: ldBob 0.55s ease-in-out infinite alternate;
+        }
+
+        @keyframes ldBob {
+            from {
+                transform: translateY(0) rotate(-5deg)
+            }
+
+            to {
+                transform: translateY(-16px) rotate(5deg)
+            }
+        }
+
+        .ld-text {
+            color: rgba(200, 180, 255, 0.85);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .ld-bar {
+            width: 220px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .ld-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #a78bfa, #ec4899);
+            border-radius: 3px;
+            animation: ldPg 1.8s ease-in-out infinite;
+        }
+
+        @keyframes ldPg {
+            0% {
+                width: 5%
+            }
+
+            60% {
+                width: 85%
+            }
+
+            100% {
+                width: 100%
+            }
+        }
+
+        .ld-sub {
+            color: rgba(200, 180, 255, 0.5);
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        /* ── UI ── */
+        #ui {
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .hdr {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 20px;
+            background: linear-gradient(180deg, rgba(2, 2, 20, 0.88) 0%, transparent 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .hdr-title {
+            font-family: 'Pacifico', cursive;
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            background: linear-gradient(90deg, #ff9de2, #a78bfa, #67e8f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 10px rgba(167, 139, 250, 0.6));
+        }
+
+        .hdr-hint {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            font-size: clamp(0.6rem, 1.4vw, 0.8rem);
+            color: rgba(200, 180, 255, 0.75);
+            font-weight: 700;
+        }
+
+        .kb {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 5px;
+            padding: 1px 7px;
+            color: #fff;
+            font-size: 0.7rem;
+        }
+
+        .prog-wrap {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(260px, 70vw);
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .prog-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #a78bfa, #ec4899);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.15s;
+        }
+
+        #dpad {
+            position: absolute;
+            bottom: 80px;
+            right: 14px;
+            display: grid;
+            grid-template-columns: repeat(3, 46px);
+            grid-template-rows: repeat(2, 46px);
+            gap: 4px;
+            pointer-events: all;
+        }
+
+        .dp {
+            background: rgba(167, 139, 250, 0.22);
+            border: 1px solid rgba(167, 139, 250, 0.45);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            touch-action: none;
+            transition: background 0.12s;
+        }
+
+        .dp:active {
+            background: rgba(167, 139, 250, 0.55);
+        }
+
+        .dp.empty {
+            background: transparent;
+            border-color: transparent;
+            pointer-events: none;
+        }
+
+        .next-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #a78bfa, #ec4899, #f97316);
+            color: #fff;
+            font-family: 'Nunito', sans-serif;
+            font-size: clamp(0.78rem, 1.8vw, 0.98rem);
+            font-weight: 900;
+            padding: 11px 30px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            pointer-events: all;
+            white-space: nowrap;
+            box-shadow: 0 6px 24px rgba(167, 139, 250, 0.45);
+            animation: ng 2s ease-in-out infinite;
+            transition: transform 0.2s;
+        }
+
+        @keyframes ng {
+
+            0%,
+            100% {
+                box-shadow: 0 6px 24px rgba(167, 139, 250, 0.45)
+            }
+
+            50% {
+                box-shadow: 0 6px 38px rgba(236, 72, 153, 0.65)
+            }
+        }
+
+        .next-btn:hover {
+            transform: translateX(-50%) translateY(-3px) scale(1.04);
+        }
+
+        .pt {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #a78bfa, #ec4899);
+            z-index: 999;
+            transform: translateX(-100%);
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.18, 1);
+        }
+
+        .pt.active {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="c"></canvas>
+
+    <div id="loading">
+        <div class="ld-duck">🦆</div>
+        <div class="ld-text">Setting up the Memory Hall...</div>
+        <div class="ld-bar">
+            <div class="ld-fill"></div>
+        </div>
+        <div class="ld-sub">Place duck.fbx + duck_tex0.png + duck_tex1.png in images/</div>
+    </div>
+
+    <div id="ui">
+        <div class="hdr">
+            <div class="hdr-title">✨ The Memory Hall ✨</div>
+            <div class="hdr-hint">
+                <span class="kb">↑</span> walk &nbsp;
+                <span class="kb">←</span><span class="kb">→</span> turn
+            </div>
+        </div>
+        <div class="prog-wrap">
+            <div class="prog-bar" id="prog"></div>
+        </div>
+        <div id="dpad">
+            <div class="dp empty"></div>
+            <div class="dp" id="btnU">▲</div>
+            <div class="dp empty"></div>
+            <div class="dp" id="btnL">◀</div>
+            <div class="dp empty"></div>
+            <div class="dp" id="btnR">▶</div>
+        </div>
+        <button class="next-btn" onclick="goNext()">Lessgooo to next step 🎉</button>
+    </div>
+    <div class="pt" id="pt"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/FBXLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/libs/fflate.min.js"></script>
+
+    <script>
+        // ══════════════════════════════════════════════════
+        //  RENDERER + SCENE
+        // ══════════════════════════════════════════════════
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+        renderer.setSize(innerWidth, innerHeight);
+        renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.setClearColor(0x06030f);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x06030f, 0.032);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = innerWidth / innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(innerWidth, innerHeight);
+        });
+
+        // ── Camera ──
+        const camera = new THREE.PerspectiveCamera(65, innerWidth / innerHeight, 0.1, 150);
+        camera.position.set(0, 1.65, 2);
+        camera.lookAt(0, 1.5, -5);
+
+        // ══════════════════════════════════════════════════
+        //  LIGHTING
+        // ══════════════════════════════════════════════════
+        const ambient = new THREE.AmbientLight(0xfff0e0, 1.8);
+        scene.add(ambient);
+
+        const hemi = new THREE.HemisphereLight(0xffeedd, 0x1a0a40, 1.2);
+        scene.add(hemi);
+
+        const HALL_LENGTH = 56;
+        const HALL_W = 8;
+        const HALL_H = 5.5;
+
+        for (let i = 0; i < 10; i++) {
+            const z = -1.5 - i * (HALL_LENGTH / 10);
+            const spot = new THREE.SpotLight(0xfff5e0, 2.8, 14, Math.PI / 6, 0.5, 1.2);
+            spot.position.set(0, HALL_H - 0.15, z);
+            spot.target.position.set(0, 0, z);
+            spot.castShadow = false;
+            scene.add(spot);
+            scene.add(spot.target);
+
+            const bulb = new THREE.Mesh(
+                new THREE.SphereGeometry(0.07, 8, 8),
+                new THREE.MeshBasicMaterial({ color: 0xfffde8 })
+            );
+            bulb.position.set(0, HALL_H - 0.1, z);
+            scene.add(bulb);
+
+            const wl = new THREE.PointLight(0x7030d0, 1.0, 5);
+            wl.position.set(i % 2 === 0 ? -HALL_W / 2 + 0.5 : HALL_W / 2 - 0.5, HALL_H * 0.55, z);
+            scene.add(wl);
+        }
+
+        // ══════════════════════════════════════════════════
+        //  HALL GEOMETRY
+        // ══════════════════════════════════════════════════
+        function makeTex(fn, w = 512, h = 512) {
+            const c = document.createElement('canvas'); c.width = w; c.height = h;
+            fn(c.getContext('2d'), w, h);
+            const t = new THREE.CanvasTexture(c);
+            t.encoding = THREE.sRGBEncoding;
+            return t;
+        }
+
+        const floorTex = makeTex((ctx, w, h) => {
+            const g = ctx.createLinearGradient(0, 0, w, h);
+            g.addColorStop(0, '#110828'); g.addColorStop(0.5, '#1c0e40'); g.addColorStop(1, '#0d0620');
+            ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = 'rgba(120,80,200,0.22)'; ctx.lineWidth = 1.5;
+            for (let i = 0; i <= w; i += 64) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke(); }
+            for (let i = 0; i <= h; i += 64) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(w, i); ctx.stroke(); }
+            ctx.strokeStyle = 'rgba(160,120,255,0.08)'; ctx.lineWidth = 2;
+            for (let i = 0; i < 8; i++) {
+                ctx.beginPath(); ctx.moveTo(Math.random() * w, 0);
+                ctx.bezierCurveTo(Math.random() * w, h / 3, Math.random() * w, 2 * h / 3, Math.random() * w, h);
+                ctx.stroke();
+            }
+        });
+        floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
+        floorTex.repeat.set(HALL_W / 2, HALL_LENGTH / 2);
+
+        const wallTex = makeTex((ctx, w, h) => {
+            const g = ctx.createLinearGradient(0, 0, 0, h);
+            g.addColorStop(0, '#160834'); g.addColorStop(0.45, '#200c4a'); g.addColorStop(1, '#120628');
+            ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = 'rgba(100,60,200,0.2)'; ctx.fillRect(0, h * 0.58, w, h * 0.06);
+            ctx.strokeStyle = 'rgba(150,100,255,0.3)'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(0, h * 0.58); ctx.lineTo(w, h * 0.58); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, h * 0.64); ctx.lineTo(w, h * 0.64); ctx.stroke();
+            ctx.strokeStyle = 'rgba(100,60,180,0.15)'; ctx.lineWidth = 1;
+            for (let i = 64; i < w; i += 128) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke(); }
+        });
+        wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+        wallTex.repeat.set(HALL_LENGTH / 3, 1);
+
+        const ceilTex = makeTex((ctx, w, h) => {
+            ctx.fillStyle = '#050115'; ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = 'rgba(100,60,200,0.12)'; ctx.lineWidth = 1;
+            for (let i = 0; i < w; i += 48) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke(); }
+            for (let i = 0; i < h; i += 48) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(w, i); ctx.stroke(); }
+        });
+        ceilTex.wrapS = ceilTex.wrapT = THREE.RepeatWrapping;
+        ceilTex.repeat.set(HALL_W / 2, HALL_LENGTH / 2);
+
+        const floor = new THREE.Mesh(
+            new THREE.PlaneGeometry(HALL_W, HALL_LENGTH),
+            new THREE.MeshLambertMaterial({ map: floorTex })
+        );
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.set(0, 0, -HALL_LENGTH / 2);
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        const ceil = new THREE.Mesh(
+            new THREE.PlaneGeometry(HALL_W, HALL_LENGTH),
+            new THREE.MeshLambertMaterial({ map: ceilTex })
+        );
+        ceil.rotation.x = Math.PI / 2;
+        ceil.position.set(0, HALL_H, -HALL_LENGTH / 2);
+        scene.add(ceil);
+
+        const leftWall = new THREE.Mesh(
+            new THREE.PlaneGeometry(HALL_LENGTH, HALL_H),
+            new THREE.MeshLambertMaterial({ map: wallTex })
+        );
+        leftWall.rotation.y = Math.PI / 2;
+        leftWall.position.set(-HALL_W / 2, HALL_H / 2, -HALL_LENGTH / 2);
+        scene.add(leftWall);
+
+        const rightWall = new THREE.Mesh(
+            new THREE.PlaneGeometry(HALL_LENGTH, HALL_H),
+            new THREE.MeshLambertMaterial({ map: wallTex.clone() })
+        );
+        rightWall.rotation.y = -Math.PI / 2;
+        rightWall.position.set(HALL_W / 2, HALL_H / 2, -HALL_LENGTH / 2);
+        scene.add(rightWall);
+
+        const endWall = new THREE.Mesh(
+            new THREE.PlaneGeometry(HALL_W, HALL_H),
+            new THREE.MeshLambertMaterial({ color: 0x110628 })
+        );
+        endWall.position.set(0, HALL_H / 2, -HALL_LENGTH);
+        scene.add(endWall);
+
+        const trimMat = new THREE.MeshLambertMaterial({ color: 0x7040c0, emissive: 0x3010a0, emissiveIntensity: 0.5 });
+        function addTrim(x) {
+            [0.04, HALL_H * 0.62, HALL_H - 0.04].forEach(y => {
+                const t = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, HALL_LENGTH), trimMat);
+                t.position.set(x, y, -HALL_LENGTH / 2);
+                scene.add(t);
+            });
+        }
+        addTrim(-HALL_W / 2 + 0.03);
+        addTrim(HALL_W / 2 - 0.03);
+
+        const starGeo = new THREE.BufferGeometry();
+        const starPos = [];
+        for (let i = 0; i < 500; i++) {
+            starPos.push((Math.random() - 0.5) * HALL_W * 0.95, HALL_H - 0.01, -Math.random() * HALL_LENGTH);
+        }
+        starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+        scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.03, transparent: true, opacity: 0.9 })));
+
+        const extStarGeo = new THREE.BufferGeometry();
+        const extPos = [];
+        for (let i = 0; i < 600; i++) {
+            extPos.push((Math.random() - 0.5) * 200, Math.random() * 60 + 5, -HALL_LENGTH - Math.random() * 80);
+        }
+        extStarGeo.setAttribute('position', new THREE.Float32BufferAttribute(extPos, 3));
+        scene.add(new THREE.Points(extStarGeo, new THREE.PointsMaterial({ color: 0xeeeeff, size: 0.25, transparent: true, opacity: 0.7 })));
+
+        // ══════════════════════════════════════════════════
+        //  PHOTO FRAMES
+        // ══════════════════════════════════════════════════
+        const FRAME_W = 1.6;
+        const FRAME_H = 1.15;
+        const FRAME_THICK = 0.06;
+        const FRAME_Y = HALL_H * 0.48;
+        const SPACING = HALL_LENGTH / 16;
+
+        const goldMat = new THREE.MeshLambertMaterial({
+            color: 0xd4a017,
+            emissive: 0x6a3800,
+            emissiveIntensity: 0.4
+        });
+
+        function makePlaceholder(num) {
+            const c = document.createElement('canvas'); c.width = 320; c.height = 240;
+            const ctx = c.getContext('2d');
+            const g = ctx.createLinearGradient(0, 0, 320, 240);
+            g.addColorStop(0, '#1a0838'); g.addColorStop(1, '#0d0624');
+            ctx.fillStyle = g; ctx.fillRect(0, 0, 320, 240);
+            ctx.strokeStyle = 'rgba(167,139,250,0.4)'; ctx.lineWidth = 2; ctx.strokeRect(6, 6, 308, 228);
+            ctx.fillStyle = 'rgba(200,180,255,0.4)'; ctx.font = '52px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('📷', 160, 110);
+            ctx.font = 'bold 22px sans-serif'; ctx.fillStyle = 'rgba(200,180,255,0.6)'; ctx.fillText('Photo ' + num, 160, 158);
+            const t = new THREE.CanvasTexture(c);
+            t.encoding = THREE.sRGBEncoding;
+            return t;
+        }
+
+        function loadPhoto(num, cb) {
+            const loader = new THREE.TextureLoader();
+            loader.load(
+                `images/photo${num}.jpg`,
+                tex => { tex.encoding = THREE.sRGBEncoding; cb(tex); },
+                undefined,
+                () => cb(makePlaceholder(num))
+            );
+        }
+
+        function buildFrame(photoNum, side, idx) {
+            const group = new THREE.Group();
+
+            const bw = FRAME_W + FRAME_THICK * 2;
+            const bh = FRAME_H + FRAME_THICK * 2;
+
+            [[0, bh / 2, FRAME_W + FRAME_THICK * 4, FRAME_THICK],
+            [0, -bh / 2, FRAME_W + FRAME_THICK * 4, FRAME_THICK]].forEach(([x, y, w, h]) => {
+                const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, FRAME_THICK), goldMat);
+                m.position.set(x, y, 0); group.add(m);
+            });
+            [[-bw / 2, 0, FRAME_THICK, bh],
+            [bw / 2, 0, FRAME_THICK, bh]].forEach(([x, y, w, h]) => {
+                const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, FRAME_THICK), goldMat);
+                m.position.set(x, y, 0); group.add(m);
+            });
+
+            const photoMat = new THREE.MeshLambertMaterial({ map: makePlaceholder(photoNum) });
+            const photo = new THREE.Mesh(new THREE.PlaneGeometry(FRAME_W, FRAME_H), photoMat);
+            photo.position.z = 0.01;
+            group.add(photo);
+
+            loadPhoto(photoNum, tex => { photoMat.map = tex; photoMat.needsUpdate = true; });
+
+            const fSpot = new THREE.SpotLight(0xfff5dd, 1.2, 3.5, Math.PI / 9, 0.45, 1.8);
+            fSpot.position.set(0, 1.5, 0.4);
+            fSpot.target.position.set(0, 0, 0);
+            group.add(fSpot); group.add(fSpot.target);
+
+            const z = -SPACING * (idx + 0.7);
+            if (side === 'L') {
+                group.position.set(-HALL_W / 2 + 0.04, FRAME_Y, z);
+                group.rotation.y = Math.PI / 2;
+            } else {
+                group.position.set(HALL_W / 2 - 0.04, FRAME_Y, z);
+                group.rotation.y = -Math.PI / 2;
+            }
+
+            scene.add(group);
+        }
+
+        for (let i = 0; i < 15; i++) {
+            buildFrame(i + 1, 'L', i);
+            buildFrame(i + 16, 'R', i);
+        }
+
+        // ══════════════════════════════════════════════════
+        //  DUCK — FBX with PIVOT wrapper fix
+        // ══════════════════════════════════════════════════
+        let duckMixer = null;
+        let duckModel = null;
+
+        // duckGroup is what moves in the scene (position + yaw from player)
+        const duckGroup = new THREE.Group();
+        duckGroup.position.set(0, 0, -0.8);
+        duckGroup.frustumCulled = false;
+        scene.add(duckGroup);
+
+        // pivot sits inside duckGroup — only used to fix the FBX facing direction
+        // without interfering with the upright X correction
+        const duckPivot = new THREE.Group();
+        duckGroup.add(duckPivot);
+
+        const texLoader = new THREE.TextureLoader();
+        const duckTex0 = texLoader.load('images/duck_tex0.png', t => { t.encoding = THREE.sRGBEncoding; t.flipY = false; });
+        const duckTex1 = texLoader.load('images/duck_tex1.png', t => { t.encoding = THREE.sRGBEncoding; t.flipY = false; });
+
+        const fbxLoader = new THREE.FBXLoader();
+        fbxLoader.load(
+            'images/duck.fbx',
+            (fbx) => {
+                // ── Step 1: Fix upright — correct the baked -90 X rotation in the FBX ──
+                fbx.rotation.set(0, 0, Math.PI / 2);
+                fbx.updateMatrixWorld(true);
+
+                // ── Step 2: Scale to target height ──
+                const box = new THREE.Box3().setFromObject(fbx);
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const targetHeight = 1.4;
+                const scale = targetHeight / maxDim;
+                fbx.scale.setScalar(scale);
+                fbx.updateMatrixWorld(true);
+
+                // ── Step 3: Sit duck exactly on floor ──
+                const box2 = new THREE.Box3().setFromObject(fbx);
+                fbx.position.y = -box2.min.y;
+
+                // ── Step 4: Apply textures ──
+                fbx.traverse(child => {
+                    if (child.isMesh || child.isSkinnedMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                        child.visible = true;
+                        child.frustumCulled = false;
+
+                        const setMap = (mat, i) => {
+                            mat.map = i === 0 ? duckTex0 : duckTex1;
+                            mat.color = new THREE.Color(1, 1, 1);
+                            mat.needsUpdate = true;
+                            return mat;
+                        };
+
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach((m, i) => setMap(m, i));
+                        } else if (child.material) {
+                            setMap(child.material, 0);
+                        }
+                    }
+                });
+
+                // ── Step 5: Add fbx to pivot, then rotate pivot to face down the hall ──
+                // The pivot Y rotation fixes the facing direction WITHOUT touching the X correction.
+                // If duck faces wrong way, try: Math.PI, 0, Math.PI/2, -Math.PI/2
+                duckPivot.add(fbx);
+                duckPivot.rotation.y = Math.PI;
+
+                duckModel = fbx;
+
+                // // ── Animations ──
+                // if (fbx.animations && fbx.animations.length > 0) {
+                //   duckMixer = new THREE.AnimationMixer(fbx);
+                //   const action = duckMixer.clipAction(fbx.animations[0]);
+                //   action.play();
+                // }
+                if (fbx.animations && fbx.animations.length > 0) {
+                    duckMixer = new THREE.AnimationMixer(fbx);
+                    const action = duckMixer.clipAction(fbx.animations[0]);
+                    action.play();
+                    // Pause at frame 0 to check rest pose
+                    action.paused = true;
+                    duckMixer.setTime(0);
+                }
+
+                console.log('Duck loaded! Animations:', fbx.animations.length);
+            },
+            (xhr) => console.log('Duck loading:', Math.round(xhr.loaded / xhr.total * 100) + '%'),
+            (err) => {
+                console.warn('FBX load failed, using primitive duck:', err);
+                buildPrimitiveDuck();
+            }
+        );
+
+        // ── Fallback primitive duck ──
+        function buildPrimitiveDuck() {
+            const mat0 = new THREE.MeshLambertMaterial({ map: duckTex0 });
+            const mat1 = new THREE.MeshLambertMaterial({ map: duckTex1 });
+
+            const body = new THREE.Mesh(new THREE.SphereGeometry(0.32, 16, 12), mat0);
+            body.scale.set(1, 0.88, 1.15); body.position.set(0, 0.44, 0);
+            duckGroup.add(body);
+
+            const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 10), mat1);
+            head.position.set(0, 0.98, 0.25); duckGroup.add(head);
+
+            const beak = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.18, 6), new THREE.MeshLambertMaterial({ color: 0xf5a020 }));
+            beak.rotation.x = Math.PI / 2; beak.position.set(0, 0.95, 0.45); duckGroup.add(beak);
+
+            const collar = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.035, 8, 16), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+            collar.position.set(0, 0.8, 0.16); collar.rotation.x = Math.PI / 4; duckGroup.add(collar);
+
+            const legMat = new THREE.MeshLambertMaterial({ color: 0xf5a020 });
+            [-0.12, 0.12].forEach(x => {
+                const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.03, 0.3, 6), legMat);
+                leg.position.set(x, 0.14, 0.04); duckGroup.add(leg);
+                const foot = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.03, 0.2), legMat);
+                foot.position.set(x, 0, 0.04); duckGroup.add(foot);
+            });
+
+            const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.38, 16), new THREE.MeshBasicMaterial({ color: 0, transparent: true, opacity: 0.32 }));
+            shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.005; duckGroup.add(shadow);
+        }
+
+        // ══════════════════════════════════════════════════
+        //  PLAYER MOVEMENT
+        // ══════════════════════════════════════════════════
+        const keys = {};
+        document.addEventListener('keydown', e => { keys[e.key] = true; e.preventDefault(); });
+        document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+        function holdKey(k, el) {
+            el.addEventListener('pointerdown', () => keys[k] = true);
+            el.addEventListener('pointerup', () => keys[k] = false);
+            el.addEventListener('pointerleave', () => keys[k] = false);
+        }
+        holdKey('ArrowUp', document.getElementById('btnU'));
+        holdKey('ArrowLeft', document.getElementById('btnL'));
+        holdKey('ArrowRight', document.getElementById('btnR'));
+
+        let camZ = 2, camYaw = 0;
+        const WALK_SPEED = 0.07, TURN_SPEED = 0.022;
+
+        // ══════════════════════════════════════════════════
+        //  ANIMATE LOOP
+        // ══════════════════════════════════════════════════
+        const clock = new THREE.Clock();
+        let walkTime = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+
+            let walking = false;
+            if (keys['ArrowUp'] || keys['w'] || keys['W']) { camZ -= WALK_SPEED; walking = true; }
+            if (keys['ArrowDown'] || keys['s'] || keys['S']) { camZ += WALK_SPEED * 0.5; }
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) { camYaw += TURN_SPEED; }
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) { camYaw -= TURN_SPEED; }
+
+            camZ = Math.max(-HALL_LENGTH + 2, Math.min(2, camZ));
+
+            // Smooth camera
+            camera.position.z += (camZ - camera.position.z) * 0.12;
+            camera.position.y = 2.2;
+            const sideX = Math.sin(camYaw) * 1.0;
+            camera.position.x += (sideX * 0.3 - camera.position.x) * 0.1;
+
+            // Look direction
+            camera.lookAt(
+                camera.position.x + Math.sin(camYaw) * 5,
+                0.8,
+                camera.position.z - Math.cos(camYaw) * 5
+            );
+
+            // Duck moves in front of camera
+            const lookDirX = Math.sin(camYaw);
+            const lookDirZ = -Math.cos(camYaw);
+            duckGroup.position.x = camera.position.x + lookDirX * 3.0;
+            duckGroup.position.z = camera.position.z + lookDirZ * 3.0;
+            duckGroup.position.y = 0;
+            // duckGroup handles yaw — pivot handles the fixed FBX facing offset
+            duckGroup.rotation.y = camYaw;
+
+            // Animate duck mixer
+            if (duckMixer) {
+                duckMixer.update(delta * (walking ? 1 : 0.1));
+            }
+
+            // Primitive duck bob
+            if (!duckMixer && duckGroup.children.length > 0) {
+                walkTime += delta * (walking ? 4 : 0);
+                duckGroup.position.y = walking ? Math.abs(Math.sin(walkTime)) * 0.05 : 0;
+            }
+
+            // Progress bar
+            const prog = Math.abs(camZ - 2) / (HALL_LENGTH - 4);
+            document.getElementById('prog').style.width = Math.min(prog * 100, 100) + '%';
+
+            renderer.render(scene, camera);
+        }
+
+        // Hide loader
+        setTimeout(() => {
+            const ld = document.getElementById('loading');
+            ld.style.transition = 'opacity 0.7s';
+            ld.style.opacity = '0';
+            setTimeout(() => ld.style.display = 'none', 700);
+        }, 1400);
+
+        animate();
+
+        function goNext() {
+            document.getElementById('pt').classList.add('active');
+            setTimeout(() => window.location.href = 'page3.html', 500);
+        }
+    </script>
+</body>
+
+</html>
