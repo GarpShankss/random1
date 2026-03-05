@@ -505,14 +505,64 @@
             const loader = new THREE.TextureLoader();
             loader.load(
                 `images/photo${num}.jpg`,
-                tex => { tex.encoding = THREE.sRGBEncoding; cb(tex); },
+                tex => { 
+                    tex.encoding = THREE.sRGBEncoding;
+                    tex.minFilter = THREE.LinearFilter;
+                    tex.magFilter = THREE.LinearFilter;
+                    cb(tex); 
+                },
                 undefined,
-                () => cb(makePlaceholder(num))
+                () => {
+                    loader.load(
+                        `images/photo${num}.jpeg`,
+                        tex => { 
+                            tex.encoding = THREE.sRGBEncoding;
+                            tex.minFilter = THREE.LinearFilter;
+                            tex.magFilter = THREE.LinearFilter;
+                            cb(tex); 
+                        },
+                        undefined,
+                        () => cb(makePlaceholder(num))
+                    );
+                }
             );
         }
 
         function buildFrame(photoNum, side, idx) {
             const group = new THREE.Group();
+
+            const photoMat = new THREE.MeshLambertMaterial({ map: makePlaceholder(photoNum) });
+            const photo = new THREE.Mesh(new THREE.PlaneGeometry(FRAME_W, FRAME_H), photoMat);
+            photo.position.z = 0.01;
+            group.add(photo);
+
+            loadPhoto(photoNum, tex => { 
+                const aspect = tex.image.width / tex.image.height;
+                const maxHeight = 1.5;
+                const h = maxHeight;
+                const w = h * aspect;
+                
+                photo.geometry.dispose();
+                photo.geometry = new THREE.PlaneGeometry(w, h);
+                photoMat.map = tex;
+                photoMat.needsUpdate = true;
+                
+                // Update frame
+                const bw = w + FRAME_THICK * 2;
+                const bh = h + FRAME_THICK * 2;
+                group.children.filter(c => c !== photo && c.type !== 'SpotLight').forEach(c => group.remove(c));
+                
+                [[0, bh / 2, w + FRAME_THICK * 4, FRAME_THICK],
+                [0, -bh / 2, w + FRAME_THICK * 4, FRAME_THICK]].forEach(([x, y, fw, fh]) => {
+                    const m = new THREE.Mesh(new THREE.BoxGeometry(fw, fh, FRAME_THICK), goldMat);
+                    m.position.set(x, y, 0); group.add(m);
+                });
+                [[-bw / 2, 0, FRAME_THICK, bh],
+                [bw / 2, 0, FRAME_THICK, bh]].forEach(([x, y, fw, fh]) => {
+                    const m = new THREE.Mesh(new THREE.BoxGeometry(fw, fh, FRAME_THICK), goldMat);
+                    m.position.set(x, y, 0); group.add(m);
+                });
+            });
 
             const bw = FRAME_W + FRAME_THICK * 2;
             const bh = FRAME_H + FRAME_THICK * 2;
@@ -527,13 +577,6 @@
                 const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, FRAME_THICK), goldMat);
                 m.position.set(x, y, 0); group.add(m);
             });
-
-            const photoMat = new THREE.MeshLambertMaterial({ map: makePlaceholder(photoNum) });
-            const photo = new THREE.Mesh(new THREE.PlaneGeometry(FRAME_W, FRAME_H), photoMat);
-            photo.position.z = 0.01;
-            group.add(photo);
-
-            loadPhoto(photoNum, tex => { photoMat.map = tex; photoMat.needsUpdate = true; });
 
             const fSpot = new THREE.SpotLight(0xfff5dd, 1.2, 3.5, Math.PI / 9, 0.45, 1.8);
             fSpot.position.set(0, 1.5, 0.4);
