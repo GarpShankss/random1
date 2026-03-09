@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday! 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #fff5f9 0%, #fce7f3 30%, #f3e8ff 60%, #fdf4ff 100%);
+    overflow-x: hidden;
+  }
+
+  /* Confetti canvas */
+  #confettiCanvas {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  /* Floating emojis burst */
+  .burst-emoji {
+    position: fixed;
+    z-index: 101;
+    font-size: 2rem;
+    pointer-events: none;
+    animation: burst ease-out forwards;
+  }
+
+  @keyframes burst {
+    0% { transform: translate(0,0) scale(0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(1.2) rotate(var(--rot)); opacity: 0; }
+  }
+
+  /* Page fade in */
+  .page-fade {
+    animation: fadeIn 0.8s ease both;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Hero section */
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px 40px;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+    gap: 16px;
+  }
+
+  .birthday-badge {
+    background: linear-gradient(135deg, #f472b6, #a855f7, #ec4899);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 8px 24px;
+    border-radius: 50px;
+    box-shadow: 0 4px 20px rgba(168,85,247,0.4);
+    animation: badgePop 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;
+  }
+
+  @keyframes badgePop {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .main-title {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(2rem, 7vw, 4rem);
+    background: linear-gradient(135deg, #ec4899, #a855f7, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 4px 15px rgba(168,85,247,0.3));
+    line-height: 1.2;
+    animation: titleSlide 0.9s cubic-bezier(0.34,1.56,0.64,1) 0.5s both;
+  }
+
+  @keyframes titleSlide {
+    from { transform: translateY(-40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .message-card {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(236,72,153,0.2);
+    border-radius: 28px;
+    padding: 32px 40px;
+    max-width: 560px;
+    box-shadow: 0 8px 40px rgba(168,85,247,0.15), 0 2px 0 rgba(255,255,255,0.9) inset;
+    animation: msgFloat 1s cubic-bezier(0.34,1.56,0.64,1) 0.7s both;
+  }
+
+  @keyframes msgFloat {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .message-text {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.4rem, 4vw, 1.9rem);
+    color: #6b21a8;
+    line-height: 1.6;
+    font-weight: 700;
+  }
+
+  .heart {
+    font-size: 2.5rem;
+    display: block;
+    margin-top: 16px;
+    animation: heartbeat 1.2s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    14% { transform: scale(1.25); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.18); }
+    70% { transform: scale(1); }
+  }
+
+  /* Decorative floating elements */
+  .deco {
+    position: fixed;
+    pointer-events: none;
+    z-index: 5;
+    animation: decoFloat ease-in-out infinite;
+    opacity: 0.4;
+  }
+
+  @keyframes decoFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+  }
+
+  /* Photo wall section */
+  .photo-section {
+    position: relative;
+    z-index: 10;
+    padding: 20px 24px 60px;
+  }
+
+  .section-title {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(1.3rem, 4vw, 2rem);
+    color: #9333ea;
+    text-align: center;
+    margin-bottom: 32px;
+    filter: drop-shadow(0 2px 10px rgba(147,51,234,0.3));
+  }
+
+  /* Cork board wall */
+  .corkboard {
+    background:
+      radial-gradient(circle at 20% 30%, rgba(205,133,63,0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(160,82,45,0.3) 0%, transparent 50%),
+      linear-gradient(135deg, #c8986a 0%, #b5845a 25%, #c9956e 50%, #b07850 75%, #c08060 100%);
+    border-radius: 24px;
+    padding: 40px 30px;
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow:
+      0 20px 60px rgba(0,0,0,0.25),
+      inset 0 1px 0 rgba(255,255,255,0.2),
+      inset 0 -1px 0 rgba(0,0,0,0.1);
+    position: relative;
+    border: 3px solid #8B5E3C;
+  }
+
+  /* Cork texture dots */
+  .corkboard::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 22px;
+    background-image: radial-gradient(circle, rgba(180,120,60,0.4) 1px, transparent 1px);
+    background-size: 12px 12px;
+    pointer-events: none;
+  }
+
+  .polaroid-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 24px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .polaroid {
+    background: #fff;
+    padding: 12px 12px 36px;
+    box-shadow: 3px 3px 12px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.8) inset;
+    position: relative;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+    cursor: pointer;
+  }
+
+  .polaroid:nth-child(1) { transform: rotate(-3deg); }
+  .polaroid:nth-child(2) { transform: rotate(2.5deg); }
+  .polaroid:nth-child(3) { transform: rotate(-1.5deg); }
+  .polaroid:nth-child(4) { transform: rotate(3.5deg); }
+  .polaroid:nth-child(5) { transform: rotate(-2deg); }
+  .polaroid:nth-child(6) { transform: rotate(1deg); }
+
+  .polaroid:hover {
+    transform: scale(1.08) rotate(0deg) translateY(-8px) !important;
+    box-shadow: 8px 12px 30px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.8) inset;
+    z-index: 10;
+  }
+
+  .pin {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+  }
+
+  .pin-head {
+    width: 16px;
+    height: 16px;
+    background: radial-gradient(circle at 35% 35%, #ff6b8e, #cc0033);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(200,0,50,0.5), inset 0 1px 2px rgba(255,255,255,0.4);
+    margin: 0 auto;
+  }
+
+  .pin-body {
+    width: 3px;
+    height: 14px;
+    background: linear-gradient(180deg, #ccc, #888);
+    margin: 0 auto;
+    border-radius: 0 0 2px 2px;
+  }
+
+  .polaroid-img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: linear-gradient(135deg, #fce7f3, #e9d5ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+    overflow: hidden;
+  }
+
+  .polaroid-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .polaroid-img-placeholder {
+    width: 100%;
+    min-height: 150px;
+    background: linear-gradient(135deg, #fce7f3, #e9d5ff);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: rgba(147,51,234,0.5);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .polaroid-caption {
+    text-align: center;
+    padding-top: 8px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1rem;
+    color: #555;
+    font-weight: 700;
+  }
+
+  /* Tape strips (alternate decoration) */
+  .tape {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 18px;
+    background: rgba(255,230,100,0.65);
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    z-index: 3;
+  }
+
+  /* Floating birthday emojis */
+  .float-bday {
+    position: fixed;
+    pointer-events: none;
+    z-index: 6;
+    animation: floatBday ease-in-out infinite;
+    font-size: 1.8rem;
+  }
+
+  @keyframes floatBday {
+    0%, 100% { transform: translateY(0) rotate(-5deg); opacity: 0.7; }
+    50% { transform: translateY(-25px) rotate(5deg); opacity: 1; }
+  }
+
+  /* Transition */
+  .page-transition {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #ec4899, #a855f7);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confettiCanvas"></canvas>
+<div class="page-transition" id="pt"></div>
+
+<div class="page-fade">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="birthday-badge">🎂 Special Day 🎂</div>
+    <div class="main-title">Happy Birthday! 🎉</div>
+
+    <div class="message-card">
+      <div class="message-text">
+        Happy Birthday to the most beautiful<br>
+        and sweetest girl I know. 🌸<br><br>
+        Have a great year ahead!<br>
+        Eat more 🍰
+      </div>
+      <span class="heart">❤️</span>
+    </div>
+  </div>
+
+  <!-- Photo Wall -->
+  <div class="photo-section">
+    <div class="section-title">📌 Our Moments 📌</div>
+
+    <div class="corkboard">
+      <div class="polaroid-grid" id="polaroidGrid">
+        <!-- JS generated -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== Confetti =====
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const CONFETTI_COLORS = [
+    '#ff6eb4','#f472b6','#a855f7','#8b5cf6',
+    '#ec4899','#facc15','#34d399','#60a5fa',
+    '#fb923c','#e879f9','#fff'
+  ];
+
+  const confettiPieces = [];
+  const SHAPES = ['rect','circle','triangle'];
+
+  class ConfettiPiece {
+    constructor() { this.reset(); }
+    reset() {
+      this.x = Math.random() * canvas.width;
+      this.y = -20 - Math.random() * 100;
+      this.size = 6 + Math.random() * 10;
+      this.color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+      this.speed = 2 + Math.random() * 4;
+      this.drift = (Math.random() - 0.5) * 2;
+      this.rotation = Math.random() * Math.PI * 2;
+      this.rotSpeed = (Math.random() - 0.5) * 0.2;
+      this.shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+      this.opacity = 0.8 + Math.random() * 0.2;
+    }
+    update() {
+      this.y += this.speed;
+      this.x += this.drift;
+      this.rotation += this.rotSpeed;
+      if (this.y > canvas.height + 20) this.reset();
+    }
+    draw() {
+      ctx.save();
+      ctx.globalAlpha = this.opacity;
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rotation);
+      ctx.fillStyle = this.color;
+
+      if (this.shape === 'rect') {
+        ctx.fillRect(-this.size/2, -this.size/4, this.size, this.size/2);
+      } else if (this.shape === 'circle') {
+        ctx.beginPath();
+        ctx.arc(0, 0, this.size/3, 0, Math.PI*2);
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(0, -this.size/2);
+        ctx.lineTo(this.size/2, this.size/2);
+        ctx.lineTo(-this.size/2, this.size/2);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
+  // Create confetti
+  for (let i = 0; i < 180; i++) {
+    const p = new ConfettiPiece();
+    p.y = Math.random() * canvas.height; // start spread
+    confettiPieces.push(p);
+  }
+
+  let confettiActive = true;
+  let confettiTimer = 0;
+
+  function animateConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (confettiActive) {
+      confettiPieces.forEach(p => { p.update(); p.draw(); });
+      confettiTimer++;
+      if (confettiTimer > 300) { // ~5 seconds at 60fps
+        confettiActive = false;
+        // Fade out remaining
+        let fade = 1;
+        const fadeOut = setInterval(() => {
+          fade -= 0.05;
+          ctx.globalAlpha = fade;
+          if (fade <= 0) { clearInterval(fadeOut); ctx.clearRect(0,0,canvas.width,canvas.height); return; }
+          ctx.clearRect(0,0,canvas.width,canvas.height);
+          confettiPieces.forEach(p => { p.update(); p.draw(); });
+        }, 50);
+        return;
+      }
+      requestAnimationFrame(animateConfetti);
+    }
+  }
+  animateConfetti();
+
+  // Emoji burst on load
+  const burstEmojis = ['🎉','🎊','🎈','💖','✨','🎂','🥳','💫','🌟','🎀'];
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+
+  for (let i = 0; i < 20; i++) {
+    setTimeout(() => {
+      const e = document.createElement('div');
+      e.className = 'burst-emoji';
+      e.textContent = burstEmojis[Math.floor(Math.random() * burstEmojis.length)];
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 100 + Math.random() * 250;
+      e.style.cssText = `
+        left: ${cx}px;
+        top: ${cy}px;
+        --tx: ${Math.cos(angle)*dist}px;
+        --ty: ${Math.sin(angle)*dist}px;
+        --rot: ${-360 + Math.random()*720}deg;
+        animation-duration: ${0.8 + Math.random()*0.6}s;
+        animation-delay: ${i*0.05}s;
+        font-size: ${1.5 + Math.random()*1.5}rem;
+      `;
+      document.body.appendChild(e);
+      setTimeout(() => e.remove(), 2000);
+    }, i * 80);
+  }
+
+  // Floating background decorations
+  const floatData = [
+    {emoji:'🎈',left:'5%',top:'15%',dur:'4s',delay:'0s'},
+    {emoji:'🌸',left:'92%',top:'10%',dur:'5s',delay:'1s'},
+    {emoji:'💖',left:'8%',top:'60%',dur:'6s',delay:'0.5s'},
+    {emoji:'⭐',left:'88%',top:'55%',dur:'4.5s',delay:'2s'},
+    {emoji:'🎀',left:'3%',top:'85%',dur:'5.5s',delay:'1.5s'},
+    {emoji:'✨',left:'94%',top:'80%',dur:'4s',delay:'0.8s'},
+  ];
+
+  floatData.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'float-bday';
+    el.textContent = d.emoji;
+    el.style.cssText = `left:${d.left};top:${d.top};animation-duration:${d.dur};animation-delay:${d.delay};`;
+    document.body.appendChild(el);
+  });
+
+  // ===== Polaroid photos =====
+  const grid = document.getElementById('polaroidGrid');
+  const captions = [
+    'Always smiling 😊','Pure joy 💕','My fav ❤️',
+    'Sunshine girl ☀️','Golden moments ✨','Best day ever 🥰'
+  ];
+  const useTape = [false, true, false, true, false, true];
+
+  for (let i = 1; i <= 6; i++) {
+    const pol = document.createElement('div');
+    pol.className = 'polaroid';
+
+    // Pin or tape
+    if (useTape[i-1]) {
+      const tape = document.createElement('div');
+      tape.className = 'tape';
+      pol.appendChild(tape);
+    } else {
+      const pin = document.createElement('div');
+      pin.className = 'pin';
+      pin.innerHTML = '<div class="pin-head"></div><div class="pin-body"></div>';
+      pol.appendChild(pin);
+    }
+
+    // Image
+    const imgWrap = document.createElement('div');
+    imgWrap.className = 'polaroid-img';
+    const img = document.createElement('img');
+    img.src = `images/photo${i}.jpg`;
+    img.alt = captions[i-1];
+    img.onerror = function() {
+      imgWrap.innerHTML = `<div class="polaroid-img-placeholder">
+        <span style="font-size:2.5rem">📷</span>
+        <span>photo${i}.jpg</span>
+      </div>`;
+    };
+    imgWrap.appendChild(img);
+    pol.appendChild(imgWrap);
+
+    const cap = document.createElement('div');
+    cap.className = 'polaroid-caption';
+    cap.textContent = captions[i-1];
+    pol.appendChild(cap);
+
+    grid.appendChild(pol);
+  }
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
+</body>
+</html>
