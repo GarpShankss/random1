@@ -324,6 +324,45 @@
     pointer-events: none;
     transition: opacity 0.4s;
   }
+
+  .next-section {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 0 24px 60px;
+  }
+
+  .next-warning {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #b91c1c;
+    margin-bottom: 12px;
+  }
+
+  .btn-next-page {
+    display: inline-block;
+    background: linear-gradient(135deg, #f97316, #ef4444, #b91c1c);
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    padding: 14px 40px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 28px rgba(239,68,68,0.5);
+    letter-spacing: 0.5px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: nextGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes nextGlow {
+    0%,100% { box-shadow: 0 6px 28px rgba(239,68,68,0.5); }
+    50%      { box-shadow: 0 6px 44px rgba(239,68,68,0.85), 0 0 0 8px rgba(239,68,68,0.1); }
+  }
+
+  .btn-next-page:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 12px 40px rgba(239,68,68,0.7); }
+  .btn-next-page:active { transform: scale(0.97); }
 </style>
 </head>
 <body>
@@ -340,7 +379,7 @@
     <div class="message-card">
       <div class="message-text">
         Happy Birthday to the most beautiful<br>
-        and sweetest girl I know. 🌸<br><br>
+        and sweetest girl I know ❤️ 🌸<br><br>
         Have a great year ahead!<br>
         Eat more 🍰
       </div>
@@ -350,13 +389,18 @@
 
   <!-- Photo Wall -->
   <div class="photo-section">
-    <div class="section-title">📌 Our Moments 📌</div>
+    <div class="section-title"></div>
 
     <div class="corkboard">
       <div class="polaroid-grid" id="polaroidGrid">
         <!-- JS generated -->
       </div>
     </div>
+  </div>
+  <!-- Next Page -->
+  <div class="next-section">
+    <div class="next-warning">⚠️ Warning: The next page is graphically more intense & disturbing! 💥</div>
+    <button class="btn-next-page" onclick="goNext()">Click Here 🔥</button>
   </div>
 </div>
 
@@ -503,7 +547,7 @@
   const grid = document.getElementById('polaroidGrid');
   const captions = [
     'Always smiling 😊','Pure joy 💕','My fav ❤️',
-    'Sunshine girl ☀️','Golden moments ✨','Best day ever 🥰'
+    'Sunshine girl ☀️','Elegance ✨','Beautiful flower girl 🥰'
   ];
   const useTape = [false, true, false, true, false, true];
 
@@ -527,7 +571,7 @@
     const imgWrap = document.createElement('div');
     imgWrap.className = 'polaroid-img';
     const img = document.createElement('img');
-    img.src = `images/photo${i}.jpg`;
+    img.src = `photos/photo${i}.jpg`;
     img.alt = captions[i-1];
     img.onerror = function() {
       imgWrap.innerHTML = `<div class="polaroid-img-placeholder">
@@ -550,6 +594,13 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   });
+
+  function goNext() {
+    document.getElementById('pt').classList.add('active');
+    document.getElementById('pt').style.opacity = '1';
+    document.getElementById('pt').style.pointerEvents = 'all';
+    setTimeout(() => window.location.href = 'page5.html', 500);
+  }
 </script>
 </body>
 </html>

@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday! 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #fff5f9 0%, #fce7f3 30%, #f3e8ff 60%, #fdf4ff 100%);
+    overflow-x: hidden;
+  }
+
+  #confettiCanvas {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  /* ===== BOMB CANVAS ===== */
+  #bombCanvas {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    pointer-events: none;
+  }
+
+  .burst-emoji {
+    position: fixed;
+    z-index: 101;
+    font-size: 2rem;
+    pointer-events: none;
+    animation: burst ease-out forwards;
+  }
+
+  @keyframes burst {
+    0% { transform: translate(0,0) scale(0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(1.2) rotate(var(--rot)); opacity: 0; }
+  }
+
+  .page-fade { animation: fadeIn 0.8s ease both; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px 40px;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+    gap: 16px;
+  }
+
+  .birthday-badge {
+    background: linear-gradient(135deg, #f472b6, #a855f7, #ec4899);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 8px 24px;
+    border-radius: 50px;
+    box-shadow: 0 4px 20px rgba(168,85,247,0.4);
+    animation: badgePop 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;
+  }
+
+  @keyframes badgePop {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .main-title {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(2rem, 7vw, 4rem);
+    background: linear-gradient(135deg, #ec4899, #a855f7, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 4px 15px rgba(168,85,247,0.3));
+    line-height: 1.2;
+    animation: titleSlide 0.9s cubic-bezier(0.34,1.56,0.64,1) 0.5s both;
+  }
+
+  @keyframes titleSlide {
+    from { transform: translateY(-40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .message-card {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(236,72,153,0.2);
+    border-radius: 28px;
+    padding: 32px 40px;
+    max-width: 560px;
+    box-shadow: 0 8px 40px rgba(168,85,247,0.15), 0 2px 0 rgba(255,255,255,0.9) inset;
+    animation: msgFloat 1s cubic-bezier(0.34,1.56,0.64,1) 0.7s both;
+  }
+
+  @keyframes msgFloat {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .message-text {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.4rem, 4vw, 1.9rem);
+    color: #6b21a8;
+    line-height: 1.6;
+    font-weight: 700;
+  }
+
+  .heart {
+    font-size: 2.5rem;
+    display: block;
+    margin-top: 16px;
+    animation: heartbeat 1.2s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    14% { transform: scale(1.25); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.18); }
+    70% { transform: scale(1); }
+  }
+
+  .float-bday {
+    position: fixed;
+    pointer-events: none;
+    z-index: 6;
+    animation: floatBday ease-in-out infinite;
+    font-size: 1.8rem;
+  }
+
+  @keyframes floatBday {
+    0%, 100% { transform: translateY(0) rotate(-5deg); opacity: 0.7; }
+    50% { transform: translateY(-25px) rotate(5deg); opacity: 1; }
+  }
+
+  .photo-section {
+    position: relative;
+    z-index: 10;
+    padding: 20px 24px 60px;
+  }
+
+  .section-title {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(1.3rem, 4vw, 2rem);
+    color: #9333ea;
+    text-align: center;
+    margin-bottom: 32px;
+    filter: drop-shadow(0 2px 10px rgba(147,51,234,0.3));
+  }
+
+  .corkboard {
+    background:
+      radial-gradient(circle at 20% 30%, rgba(205,133,63,0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(160,82,45,0.3) 0%, transparent 50%),
+      linear-gradient(135deg, #c8986a 0%, #b5845a 25%, #c9956e 50%, #b07850 75%, #c08060 100%);
+    border-radius: 24px;
+    padding: 40px 30px;
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.1);
+    position: relative;
+    border: 3px solid #8B5E3C;
+  }
+
+  .corkboard::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 22px;
+    background-image: radial-gradient(circle, rgba(180,120,60,0.4) 1px, transparent 1px);
+    background-size: 12px 12px;
+    pointer-events: none;
+  }
+
+  .polaroid-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 24px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .polaroid {
+    background: #fff;
+    padding: 12px 12px 36px;
+    box-shadow: 3px 3px 12px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.8) inset;
+    position: relative;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+    cursor: pointer;
+  }
+
+  .polaroid:nth-child(1) { transform: rotate(-3deg); }
+  .polaroid:nth-child(2) { transform: rotate(2.5deg); }
+  .polaroid:nth-child(3) { transform: rotate(-1.5deg); }
+  .polaroid:nth-child(4) { transform: rotate(3.5deg); }
+  .polaroid:nth-child(5) { transform: rotate(-2deg); }
+  .polaroid:nth-child(6) { transform: rotate(1deg); }
+
+  .polaroid:hover {
+    transform: scale(1.08) rotate(0deg) translateY(-8px) !important;
+    box-shadow: 8px 12px 30px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.8) inset;
+    z-index: 10;
+  }
+
+  .pin { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); z-index: 3; }
+  .pin-head {
+    width: 16px; height: 16px;
+    background: radial-gradient(circle at 35% 35%, #ff6b8e, #cc0033);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(200,0,50,0.5), inset 0 1px 2px rgba(255,255,255,0.4);
+    margin: 0 auto;
+  }
+  .pin-body { width: 3px; height: 14px; background: linear-gradient(180deg, #ccc, #888); margin: 0 auto; border-radius: 0 0 2px 2px; }
+
+  .polaroid-img {
+    width: 100%; aspect-ratio: 1; object-fit: cover;
+    background: linear-gradient(135deg, #fce7f3, #e9d5ff);
+    display: flex; align-items: center; justify-content: center;
+    min-height: 150px; overflow: hidden;
+  }
+  .polaroid-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .polaroid-img-placeholder {
+    width: 100%; min-height: 150px;
+    background: linear-gradient(135deg, #fce7f3, #e9d5ff);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; color: rgba(147,51,234,0.5); font-size: 0.75rem; font-weight: 700;
+  }
+
+  .polaroid-caption { text-align: center; padding-top: 8px; font-family: 'Dancing Script', cursive; font-size: 1rem; color: #555; font-weight: 700; }
+  .tape { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 50px; height: 18px; background: rgba(255,230,100,0.65); border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); z-index: 3; }
+  .page-transition { position: fixed; inset: 0; background: linear-gradient(135deg, #ec4899, #a855f7); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
+
+  /* ===== SCREEN SHAKE ===== */
+  @keyframes screenShake {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    10% { transform: translate(-6px, -4px) rotate(-0.5deg); }
+    20% { transform: translate(8px, 4px) rotate(0.5deg); }
+    30% { transform: translate(-5px, 6px) rotate(-0.3deg); }
+    40% { transform: translate(6px, -5px) rotate(0.4deg); }
+    50% { transform: translate(-4px, 3px) rotate(-0.2deg); }
+    60% { transform: translate(5px, -4px) rotate(0.3deg); }
+    70% { transform: translate(-3px, 5px) rotate(-0.2deg); }
+    80% { transform: translate(4px, -3px) rotate(0.1deg); }
+    90% { transform: translate(-2px, 2px) rotate(-0.1deg); }
+  }
+
+  body.shaking {
+    animation: screenShake 0.5s ease-in-out;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confettiCanvas"></canvas>
+<canvas id="bombCanvas"></canvas>
+<div class="page-transition" id="pt"></div>
+
+<div class="page-fade">
+  <div class="hero">
+    <div class="birthday-badge">🎂 Special Day 🎂</div>
+    <div class="main-title">Happy Birthday! 🎉</div>
+    <div class="message-card">
+      <div class="message-text">
+        Happy Birthday to the most beautiful<br>
+        and sweetest girl I know ❤️ 🌸<br><br>
+        Have a great year ahead!<br>
+        Eat more 🍰
+      </div>
+      <span class="heart">❤️</span>
+    </div>
+  </div>
+
+  <div class="photo-section">
+    <div class="section-title"></div>
+    <div class="corkboard">
+      <div class="polaroid-grid" id="polaroidGrid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== CONFETTI =====
+const canvas = document.getElementById('confettiCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const CONFETTI_COLORS = ['#ff6eb4','#f472b6','#a855f7','#8b5cf6','#ec4899','#facc15','#34d399','#60a5fa','#fb923c','#e879f9','#fff'];
+const confettiPieces = [];
+const SHAPES = ['rect','circle','triangle'];
+
+class ConfettiPiece {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = -20 - Math.random() * 100;
+    this.size = 6 + Math.random() * 10;
+    this.color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+    this.speed = 2 + Math.random() * 4;
+    this.drift = (Math.random() - 0.5) * 2;
+    this.rotation = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.2;
+    this.shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+    this.opacity = 0.8 + Math.random() * 0.2;
+  }
+  update() {
+    this.y += this.speed; this.x += this.drift; this.rotation += this.rotSpeed;
+    if (this.y > canvas.height + 20) this.reset();
+  }
+  draw() {
+    ctx.save(); ctx.globalAlpha = this.opacity;
+    ctx.translate(this.x, this.y); ctx.rotate(this.rotation); ctx.fillStyle = this.color;
+    if (this.shape === 'rect') { ctx.fillRect(-this.size/2, -this.size/4, this.size, this.size/2); }
+    else if (this.shape === 'circle') { ctx.beginPath(); ctx.arc(0,0,this.size/3,0,Math.PI*2); ctx.fill(); }
+    else { ctx.beginPath(); ctx.moveTo(0,-this.size/2); ctx.lineTo(this.size/2,this.size/2); ctx.lineTo(-this.size/2,this.size/2); ctx.closePath(); ctx.fill(); }
+    ctx.restore();
+  }
+}
+
+for (let i = 0; i < 180; i++) {
+  const p = new ConfettiPiece();
+  p.y = Math.random() * canvas.height;
+  confettiPieces.push(p);
+}
+
+let confettiActive = true, confettiTimer = 0;
+function animateConfetti() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (confettiActive) {
+    confettiPieces.forEach(p => { p.update(); p.draw(); });
+    confettiTimer++;
+    if (confettiTimer > 300) {
+      confettiActive = false;
+      let fade = 1;
+      const fadeOut = setInterval(() => {
+        fade -= 0.05;
+        ctx.globalAlpha = fade;
+        if (fade <= 0) { clearInterval(fadeOut); ctx.clearRect(0,0,canvas.width,canvas.height); return; }
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        confettiPieces.forEach(p => { p.update(); p.draw(); });
+      }, 50);
+      return;
+    }
+    requestAnimationFrame(animateConfetti);
+  }
+}
+animateConfetti();
+
+// ===== EMOJI BURST =====
+const burstEmojis = ['🎉','🎊','🎈','💖','✨','🎂','🥳','💫','🌟','🎀'];
+const cx0 = window.innerWidth / 2, cy0 = window.innerHeight / 2;
+for (let i = 0; i < 20; i++) {
+  setTimeout(() => {
+    const e = document.createElement('div');
+    e.className = 'burst-emoji';
+    e.textContent = burstEmojis[Math.floor(Math.random() * burstEmojis.length)];
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 100 + Math.random() * 250;
+    e.style.cssText = `left:${cx0}px;top:${cy0}px;--tx:${Math.cos(angle)*dist}px;--ty:${Math.sin(angle)*dist}px;--rot:${-360+Math.random()*720}deg;animation-duration:${0.8+Math.random()*0.6}s;animation-delay:${i*0.05}s;font-size:${1.5+Math.random()*1.5}rem;`;
+    document.body.appendChild(e);
+    setTimeout(() => e.remove(), 2000);
+  }, i * 80);
+}
+
+// ===== FLOATING DECORATIONS =====
+[
+  {emoji:'🎈',left:'5%',top:'15%',dur:'4s',delay:'0s'},
+  {emoji:'🌸',left:'92%',top:'10%',dur:'5s',delay:'1s'},
+  {emoji:'💖',left:'8%',top:'60%',dur:'6s',delay:'0.5s'},
+  {emoji:'⭐',left:'88%',top:'55%',dur:'4.5s',delay:'2s'},
+  {emoji:'🎀',left:'3%',top:'85%',dur:'5.5s',delay:'1.5s'},
+  {emoji:'✨',left:'94%',top:'80%',dur:'4s',delay:'0.8s'},
+].forEach(d => {
+  const el = document.createElement('div');
+  el.className = 'float-bday';
+  el.textContent = d.emoji;
+  el.style.cssText = `left:${d.left};top:${d.top};animation-duration:${d.dur};animation-delay:${d.delay};`;
+  document.body.appendChild(el);
+});
+
+// ===== POLAROIDS =====
+const grid = document.getElementById('polaroidGrid');
+const captions = ['Always smiling 😊','Pure joy 💕','My fav ❤️','Sunshine girl ☀️','Elegance ✨','Beautiful flower girl 🥰'];
+const useTape = [false,true,false,true,false,true];
+for (let i = 1; i <= 6; i++) {
+  const pol = document.createElement('div');
+  pol.className = 'polaroid';
+  if (useTape[i-1]) {
+    const tape = document.createElement('div'); tape.className = 'tape'; pol.appendChild(tape);
+  } else {
+    const pin = document.createElement('div'); pin.className = 'pin';
+    pin.innerHTML = '<div class="pin-head"></div><div class="pin-body"></div>'; pol.appendChild(pin);
+  }
+  const imgWrap = document.createElement('div'); imgWrap.className = 'polaroid-img';
+  const img = document.createElement('img'); img.src = `photos/photo${i}.jpg`; img.alt = captions[i-1];
+  img.onerror = function() { imgWrap.innerHTML = `<div class="polaroid-img-placeholder"><span style="font-size:2.5rem">📷</span><span>photo${i}.jpg</span></div>`; };
+  imgWrap.appendChild(img); pol.appendChild(imgWrap);
+  const cap = document.createElement('div'); cap.className = 'polaroid-caption'; cap.textContent = captions[i-1];
+  pol.appendChild(cap); grid.appendChild(pol);
+}
+
+
+// ===========================
+// ===== BOMB + PLANE SYS ====
+// ===========================
+const bc = document.getElementById('bombCanvas');
+const bctx = bc.getContext('2d');
+bc.width = window.innerWidth;
+bc.height = window.innerHeight;
+
+const planes = [];
+const bombs = [];
+const explosions = [];
+const smokeTrails = [];
+
+// ===== PLANE CLASS =====
+class Plane {
+  constructor() { this.spawn(); }
+  spawn() {
+    this.dir = Math.random() < 0.5 ? 1 : -1; // 1 = left to right, -1 = right to left
+    this.y = 40 + Math.random() * (bc.height * 0.35);
+    this.x = this.dir === 1 ? -120 : bc.width + 120;
+    this.speed = 2.5 + Math.random() * 2;
+    this.size = 0.7 + Math.random() * 0.5;
+    this.bombCooldown = 60 + Math.random() * 80;
+    this.bombTimer = this.bombCooldown * 0.3;
+    this.bobOffset = Math.random() * Math.PI * 2;
+    this.enginePuff = 0;
+    this.alive = true;
+    this.bombsDropped = 0;
+    this.maxBombs = 1 + Math.floor(Math.random() * 2);
+  }
+  update() {
+    this.x += this.speed * this.dir;
+    this.y += Math.sin(Date.now() * 0.002 + this.bobOffset) * 0.3;
+    this.bombTimer--;
+    this.enginePuff++;
+
+    // Drop bombs
+    if (this.bombTimer <= 0 && this.bombsDropped < this.maxBombs) {
+      bombs.push(new Bomb(this.x, this.y + 10 * this.size));
+      smokeTrails.push(new SmokeTrail(this.x, this.y + 10 * this.size));
+      this.bombTimer = this.bombCooldown;
+      this.bombsDropped++;
+    }
+
+    // Off screen
+    if ((this.dir === 1 && this.x > bc.width + 150) || (this.dir === -1 && this.x < -150)) {
+      this.alive = false;
+    }
+  }
+  draw() {
+    bctx.save();
+    bctx.translate(this.x, this.y);
+    if (this.dir === -1) bctx.scale(-1, 1);
+    bctx.scale(this.size, this.size);
+
+    // Engine smoke puffs
+    if (this.enginePuff % 8 === 0) {
+      smokeTrails.push(new SmokeTrail(
+        this.x + (this.dir === 1 ? -50 : 50) * this.size,
+        this.y,
+        true
+      ));
+    }
+
+    // ---- Plane body ----
+    // Fuselage
+    bctx.fillStyle = '#4a4a6a';
+    bctx.beginPath();
+    bctx.ellipse(0, 0, 55, 12, 0, 0, Math.PI * 2);
+    bctx.fill();
+
+    // Nose cone
+    bctx.fillStyle = '#6a3a3a';
+    bctx.beginPath();
+    bctx.moveTo(52, 0);
+    bctx.quadraticCurveTo(72, -3, 75, 0);
+    bctx.quadraticCurveTo(72, 3, 52, 0);
+    bctx.fill();
+
+    // Cockpit glass
+    bctx.fillStyle = '#7ecff5';
+    bctx.globalAlpha = 0.8;
+    bctx.beginPath();
+    bctx.ellipse(30, -5, 14, 8, -0.3, 0, Math.PI * 2);
+    bctx.fill();
+    bctx.globalAlpha = 1;
+
+    // Cockpit frame
+    bctx.strokeStyle = '#333';
+    bctx.lineWidth = 1.5;
+    bctx.beginPath();
+    bctx.ellipse(30, -5, 14, 8, -0.3, 0, Math.PI * 2);
+    bctx.stroke();
+
+    // Main wings
+    bctx.fillStyle = '#3a3a5a';
+    bctx.beginPath();
+    bctx.moveTo(10, -2);
+    bctx.lineTo(-20, -38);
+    bctx.lineTo(-35, -38);
+    bctx.lineTo(-25, -2);
+    bctx.lineTo(10, -2);
+    bctx.fill();
+    // Wing underside
+    bctx.beginPath();
+    bctx.moveTo(10, 2);
+    bctx.lineTo(-20, 38);
+    bctx.lineTo(-35, 38);
+    bctx.lineTo(-25, 2);
+    bctx.lineTo(10, 2);
+    bctx.fill();
+
+    // Wing stripe
+    bctx.strokeStyle = '#ff4466';
+    bctx.lineWidth = 2;
+    bctx.beginPath();
+    bctx.moveTo(5, -18);
+    bctx.lineTo(-28, -36);
+    bctx.stroke();
+    bctx.beginPath();
+    bctx.moveTo(5, 18);
+    bctx.lineTo(-28, 36);
+    bctx.stroke();
+
+    // Tail fin
+    bctx.fillStyle = '#3a3a5a';
+    bctx.beginPath();
+    bctx.moveTo(-40, 0);
+    bctx.lineTo(-55, -28);
+    bctx.lineTo(-45, -28);
+    bctx.lineTo(-35, 0);
+    bctx.fill();
+
+    // Horizontal stabilizers
+    bctx.beginPath();
+    bctx.moveTo(-42, -2);
+    bctx.lineTo(-58, -16);
+    bctx.lineTo(-65, -14);
+    bctx.lineTo(-48, -2);
+    bctx.fill();
+    bctx.beginPath();
+    bctx.moveTo(-42, 2);
+    bctx.lineTo(-58, 16);
+    bctx.lineTo(-65, 14);
+    bctx.lineTo(-48, 2);
+    bctx.fill();
+
+    // Engine pod
+    bctx.fillStyle = '#555577';
+    bctx.beginPath();
+    bctx.ellipse(-15, 0, 22, 8, 0, 0, Math.PI * 2);
+    bctx.fill();
+    // Engine exhaust ring
+    bctx.strokeStyle = '#ff8822';
+    bctx.lineWidth = 2;
+    bctx.beginPath();
+    bctx.ellipse(-36, 0, 5, 7, 0, 0, Math.PI * 2);
+    bctx.stroke();
+
+    // Star roundel
+    bctx.fillStyle = '#ffffff';
+    bctx.beginPath();
+    for (let s = 0; s < 5; s++) {
+      const a = (s * 4 * Math.PI / 5) - Math.PI/2;
+      const ai = ((s * 4 + 2) * Math.PI / 5) - Math.PI/2;
+      if (s === 0) bctx.moveTo(Math.cos(a)*8, Math.sin(a)*8);
+      else bctx.lineTo(Math.cos(a)*8, Math.sin(a)*8);
+      bctx.lineTo(Math.cos(ai)*3.5, Math.sin(ai)*3.5);
+    }
+    bctx.closePath();
+    bctx.fill();
+
+    bctx.restore();
+  }
+}
+
+// ===== BOMB CLASS =====
+class Bomb {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.vx = (Math.random() - 0.5) * 1.5;
+    this.vy = 1;
+    this.gravity = 0.35;
+    this.rotation = 0;
+    this.rotSpeed = (Math.random() - 0.5) * 0.15;
+    this.alive = true;
+    this.trail = [];
+  }
+  update() {
+    this.trail.push({x: this.x, y: this.y, age: 0});
+    this.trail.forEach(t => t.age++);
+    this.trail = this.trail.filter(t => t.age < 12);
+
+    this.vy += this.gravity;
+    this.x += this.vx;
+    this.y += this.vy;
+    this.rotation += this.rotSpeed + this.vy * 0.02;
+
+    // Hit ground or bottom
+    if (this.y >= bc.height - 10) {
+      this.alive = false;
+      explosions.push(new Explosion(this.x, bc.height - 10));
+      triggerShake();
+    }
+    if (this.y > bc.height + 50) this.alive = false;
+  }
+  draw() {
+    // Smoke trail
+    this.trail.forEach((t, i) => {
+      const alpha = (1 - t.age / 12) * 0.4;
+      bctx.fillStyle = `rgba(120,120,120,${alpha})`;
+      bctx.beginPath();
+      bctx.arc(t.x, t.y, 3 * (1 - t.age/12), 0, Math.PI * 2);
+      bctx.fill();
+    });
+
+    bctx.save();
+    bctx.translate(this.x, this.y);
+    bctx.rotate(this.rotation);
+
+    // Bomb body
+    bctx.fillStyle = '#2a2a2a';
+    bctx.beginPath();
+    bctx.ellipse(0, 0, 7, 12, 0, 0, Math.PI * 2);
+    bctx.fill();
+
+    // Bomb nose
+    bctx.fillStyle = '#cc3300';
+    bctx.beginPath();
+    bctx.ellipse(0, -12, 5, 5, 0, 0, Math.PI);
+    bctx.fill();
+
+    // Bomb fins
+    bctx.fillStyle = '#444';
+    [-1, 1].forEach(side => {
+      bctx.beginPath();
+      bctx.moveTo(side * 6, 6);
+      bctx.lineTo(side * 14, 16);
+      bctx.lineTo(side * 6, 14);
+      bctx.fill();
+    });
+
+    // Shine
+    bctx.fillStyle = 'rgba(255,255,255,0.25)';
+    bctx.beginPath();
+    bctx.ellipse(-2, -4, 2, 5, -0.3, 0, Math.PI * 2);
+    bctx.fill();
+
+    bctx.restore();
+  }
+}
+
+// ===== SMOKE TRAIL =====
+class SmokeTrail {
+  constructor(x, y, isEngine = false) {
+    this.x = x; this.y = y;
+    this.vx = (Math.random() - 0.5) * 0.8;
+    this.vy = -0.5 - Math.random() * 0.5;
+    this.radius = isEngine ? 6 + Math.random() * 4 : 4 + Math.random() * 3;
+    this.maxRadius = this.radius * 3;
+    this.alpha = isEngine ? 0.4 : 0.5;
+    this.alive = true;
+    this.isEngine = isEngine;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    this.radius += 0.4;
+    this.alpha -= 0.012;
+    if (this.alpha <= 0) this.alive = false;
+  }
+  draw() {
+    bctx.fillStyle = `rgba(160,160,160,${this.alpha})`;
+    bctx.beginPath();
+    bctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    bctx.fill();
+  }
+}
+
+// ===== EXPLOSION CLASS =====
+class Explosion {
+  constructor(x, y) {
+    this.x = x; this.y = y;
+    this.particles = [];
+    this.rings = [];
+    this.shockwave = { r: 0, alpha: 1 };
+    this.flashAlpha = 1;
+    this.frame = 0;
+    this.alive = true;
+    this.totalFrames = 90;
+
+    // Particle burst
+    const colors = ['#ff6600','#ff9900','#ffcc00','#ff3300','#ffffff','#ff4488'];
+    for (let i = 0; i < 60; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2 + Math.random() * 8;
+      this.particles.push({
+        x: this.x, y: this.y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: 2 + Math.random() * 5,
+        alpha: 1,
+        gravity: 0.18,
+        decay: 0.015 + Math.random() * 0.01,
+        trail: []
+      });
+    }
+
+    // Debris chunks
+    for (let i = 0; i < 20; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 3 + Math.random() * 12;
+      this.particles.push({
+        x: this.x, y: this.y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 5,
+        color: Math.random() < 0.5 ? '#444' : '#666',
+        size: 4 + Math.random() * 7,
+        alpha: 1,
+        gravity: 0.25,
+        decay: 0.008 + Math.random() * 0.008,
+        isDebris: true,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.3,
+        trail: []
+      });
+    }
+
+    // Fireball rings
+    for (let r = 0; r < 3; r++) {
+      this.rings.push({
+        r: 0,
+        maxR: 50 + r * 40,
+        alpha: 0.8,
+        delay: r * 8,
+        color: r === 0 ? '#ffcc00' : r === 1 ? '#ff6600' : '#ff3300'
+      });
+    }
+
+    // Birthday confetti burst!
+    const bdColors = ['#ff6eb4','#f472b6','#a855f7','#8b5cf6','#ec4899','#facc15'];
+    for (let i = 0; i < 30; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 4 + Math.random() * 10;
+      this.particles.push({
+        x: this.x, y: this.y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 6,
+        color: bdColors[Math.floor(Math.random() * bdColors.length)],
+        size: 5 + Math.random() * 6,
+        alpha: 1,
+        gravity: 0.12,
+        decay: 0.01,
+        isBday: true,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.4,
+        trail: []
+      });
+    }
+  }
+
+  update() {
+    this.frame++;
+    this.flashAlpha = Math.max(0, 1 - this.frame / 8);
+    this.shockwave.r += 12;
+    this.shockwave.alpha = Math.max(0, 1 - this.shockwave.r / 200);
+
+    this.rings.forEach(ring => {
+      if (this.frame < ring.delay) return;
+      ring.r += 6;
+      ring.alpha = Math.max(0, 0.8 * (1 - ring.r / ring.maxR));
+    });
+
+    this.particles.forEach(p => {
+      p.trail.push({x: p.x, y: p.y});
+      if (p.trail.length > 6) p.trail.shift();
+      p.vx *= 0.97;
+      p.vy += p.gravity;
+      p.x += p.vx; p.y += p.vy;
+      p.alpha -= p.decay;
+      if (p.isDebris || p.isBday) p.rotation += p.rotSpeed;
+    });
+    this.particles = this.particles.filter(p => p.alpha > 0);
+
+    if (this.frame > this.totalFrames) this.alive = false;
+  }
+
+  draw() {
+    // Flash
+    if (this.flashAlpha > 0) {
+      bctx.save();
+      bctx.globalCompositeOperation = 'lighter';
+      const grd = bctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, 120);
+      grd.addColorStop(0, `rgba(255,255,200,${this.flashAlpha})`);
+      grd.addColorStop(1, `rgba(255,150,0,0)`);
+      bctx.fillStyle = grd;
+      bctx.beginPath();
+      bctx.arc(this.x, this.y, 120, 0, Math.PI * 2);
+      bctx.fill();
+      bctx.restore();
+    }
+
+    // Shockwave ring
+    if (this.shockwave.alpha > 0) {
+      bctx.save();
+      bctx.strokeStyle = `rgba(255,220,100,${this.shockwave.alpha})`;
+      bctx.lineWidth = 3;
+      bctx.beginPath();
+      bctx.arc(this.x, this.y, this.shockwave.r, 0, Math.PI * 2);
+      bctx.stroke();
+      bctx.restore();
+    }
+
+    // Fireball rings
+    this.rings.forEach(ring => {
+      if (ring.alpha <= 0) return;
+      bctx.save();
+      bctx.globalCompositeOperation = 'lighter';
+      const grd = bctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, ring.r);
+      grd.addColorStop(0, `rgba(255,255,255,${ring.alpha})`);
+      grd.addColorStop(0.4, ring.color.replace(')', `,${ring.alpha})`).replace('rgb', 'rgba'));
+      grd.addColorStop(1, `rgba(0,0,0,0)`);
+      bctx.fillStyle = grd;
+      bctx.beginPath();
+      bctx.arc(this.x, this.y, ring.r, 0, Math.PI * 2);
+      bctx.fill();
+      bctx.restore();
+    });
+
+    // Particles
+    this.particles.forEach(p => {
+      // Trail
+      if (p.trail.length > 1) {
+        bctx.save();
+        bctx.strokeStyle = p.color;
+        bctx.lineWidth = p.size * 0.5;
+        bctx.globalAlpha = p.alpha * 0.4;
+        bctx.beginPath();
+        p.trail.forEach((t, i) => i === 0 ? bctx.moveTo(t.x, t.y) : bctx.lineTo(t.x, t.y));
+        bctx.stroke();
+        bctx.restore();
+      }
+
+      bctx.save();
+      bctx.globalAlpha = p.alpha;
+      bctx.translate(p.x, p.y);
+
+      if (p.isBday) {
+        bctx.rotate(p.rotation);
+        bctx.fillStyle = p.color;
+        bctx.fillRect(-p.size/2, -p.size/4, p.size, p.size/2);
+      } else if (p.isDebris) {
+        bctx.rotate(p.rotation);
+        bctx.fillStyle = p.color;
+        bctx.fillRect(-p.size/2, -p.size/2, p.size * 0.6, p.size);
+      } else {
+        bctx.fillStyle = p.color;
+        bctx.shadowColor = p.color;
+        bctx.shadowBlur = 4;
+        bctx.beginPath();
+        bctx.arc(0, 0, p.size, 0, Math.PI * 2);
+        bctx.fill();
+      }
+      bctx.restore();
+    });
+
+    // Ground scorch mark
+    if (this.frame > 5 && this.frame < 80) {
+      const scAlpha = Math.min(0.4, (this.frame - 5) / 20) * (1 - (this.frame - 20) / 60);
+      if (scAlpha > 0) {
+        bctx.save();
+        const scorchR = Math.min(60, this.frame * 3);
+        const grd = bctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, scorchR);
+        grd.addColorStop(0, `rgba(0,0,0,${scAlpha})`);
+        grd.addColorStop(1, `rgba(0,0,0,0)`);
+        bctx.fillStyle = grd;
+        bctx.beginPath();
+        bctx.ellipse(this.x, this.y, scorchR, scorchR * 0.3, 0, 0, Math.PI * 2);
+        bctx.fill();
+        bctx.restore();
+      }
+    }
+
+    // Mushroom smoke cloud
+    if (this.frame > 10) {
+      const cloudAge = this.frame - 10;
+      const cloudAlpha = Math.max(0, 0.5 - cloudAge / 80);
+      if (cloudAlpha > 0) {
+        for (let c = 0; c < 5; c++) {
+          const cr = 20 + c * 15 + cloudAge * 0.8;
+          const cy2 = this.y - 20 - cloudAge * 1.5 - c * 10;
+          bctx.save();
+          bctx.fillStyle = `rgba(80,80,80,${cloudAlpha * 0.3})`;
+          bctx.beginPath();
+          bctx.arc(this.x + (c - 2) * 12, cy2, cr, 0, Math.PI * 2);
+          bctx.fill();
+          bctx.restore();
+        }
+      }
+    }
+  }
+}
+
+// ===== SCREEN SHAKE =====
+function triggerShake() {
+  document.body.classList.remove('shaking');
+  void document.body.offsetWidth;
+  document.body.classList.add('shaking');
+  setTimeout(() => document.body.classList.remove('shaking'), 500);
+}
+
+// ===== SPAWN PLANES =====
+let planeSpawnTimer = 0;
+const PLANE_SPAWN_INTERVAL = 280;
+
+function spawnPlane() {
+  planes.push(new Plane());
+}
+
+// Initial plane after 2s
+setTimeout(() => spawnPlane(), 2000);
+
+// ===== MAIN BOMB LOOP =====
+function bombLoop() {
+  bctx.clearRect(0, 0, bc.width, bc.height);
+
+  // Spawn planes
+  planeSpawnTimer++;
+  if (planeSpawnTimer >= PLANE_SPAWN_INTERVAL) {
+    spawnPlane();
+    planeSpawnTimer = 0;
+  }
+
+  // Update + draw smoke
+  smokeTrails.forEach(s => s.update());
+  smokeTrails.forEach(s => s.draw());
+  for (let i = smokeTrails.length - 1; i >= 0; i--) {
+    if (!smokeTrails[i].alive) smokeTrails.splice(i, 1);
+  }
+
+  // Update + draw bombs
+  bombs.forEach(b => b.update());
+  bombs.forEach(b => b.draw());
+  for (let i = bombs.length - 1; i >= 0; i--) {
+    if (!bombs[i].alive) bombs.splice(i, 1);
+  }
+
+  // Update + draw planes
+  planes.forEach(p => p.update());
+  planes.forEach(p => p.draw());
+  for (let i = planes.length - 1; i >= 0; i--) {
+    if (!planes[i].alive) planes.splice(i, 1);
+  }
+
+  // Update + draw explosions
+  explosions.forEach(e => e.update());
+  explosions.forEach(e => e.draw());
+  for (let i = explosions.length - 1; i >= 0; i--) {
+    if (!explosions[i].alive) explosions.splice(i, 1);
+  }
+
+  requestAnimationFrame(bombLoop);
+}
+bombLoop();
+
+// Click to spawn explosion anywhere
+document.addEventListener('click', (ev) => {
+  explosions.push(new Explosion(ev.clientX, ev.clientY));
+  triggerShake();
+});
+
+window.addEventListener('resize', () => {
+  canvas.width = bc.width = window.innerWidth;
+  canvas.height = bc.height = window.innerHeight;
+});
+</script>
+</body>
+</html>
